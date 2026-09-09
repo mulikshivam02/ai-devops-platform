@@ -8,7 +8,9 @@
 
 ## Resource Center
 
-Status: Planned
+Status: Implemented
+
+Phase 2 provides a manually managed normalized resource inventory. External discovery integrations remain future work.
 
 Discover and normalize:
 - GitHub

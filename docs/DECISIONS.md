@@ -16,6 +16,20 @@ This keeps development, testing and deployment simpler.
 
 Microservices can be considered later if there is a demonstrated need.
 
+## ADR-007 - Resource Center Records
+
+Status: Accepted
+
+### Decision
+
+Phase 2 stores normalized resource records in MongoDB and allows them to be managed manually through the REST API and frontend.
+
+Resource status is explicit and defaults to `unknown`; creating a record does not claim that ChangeLens is connected to the external system.
+
+### Reason
+
+The Resource Center needs a stable domain contract before external collectors are introduced. Keeping integrations out of this phase avoids inventing connectivity or infrastructure state.
+
 ## ADR-002 - Evidence-First AI
 
 Status: Accepted

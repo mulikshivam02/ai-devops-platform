@@ -6,12 +6,14 @@ import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { notFoundHandler } from './middleware/not-found.middleware.js';
 import { healthRouter } from './routes/health.routes.js';
+import { resourceRouter } from './routes/resourceRoutes.js';
 
 export const app = express();
 
 app.use(cors({ origin: env.corsOrigin }));
 app.use(express.json());
 app.use('/api/health', healthRouter);
+app.use('/api/resources', resourceRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

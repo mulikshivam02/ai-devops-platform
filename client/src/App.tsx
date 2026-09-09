@@ -1,4 +1,5 @@
 import { HomePage } from './pages/HomePage';
+import { ResourcesPage } from './pages/ResourcesPage';
 import './styles.css';
 
 export default function App() {
@@ -9,9 +10,10 @@ export default function App() {
           <span className="brand-mark" aria-hidden="true">C</span>
           <span>ChangeLens</span>
         </a>
-        <span className="topbar-label">Platform foundation</span>
+        <nav className="topbar-nav"><a href="#resources">Resources</a><span className="topbar-label">Platform foundation</span></nav>
       </header>
       <HomePage />
+      <ResourcesPage />
     </>
   );
 }

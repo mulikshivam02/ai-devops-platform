@@ -20,6 +20,9 @@ body::before { position: fixed; inset: 0; z-index: -1; background-image: linear-
 
 .topbar-label { color: #8294a9; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; }
 
+.topbar-nav { display: flex; align-items: center; gap: 24px; }
+.topbar-nav a { color: #f4b860; font-family: 'Segoe UI', sans-serif; font-size: .8rem; text-decoration: none; }
+
 .page-shell { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: clamp(40px, 8vw, 128px); align-items: center; max-width: 1180px; min-height: calc(100vh - 92px); margin: 0 auto; padding: 40px 32px 100px; }
 
 .intro-panel { max-width: 680px; animation: rise-in .7s ease both; }
@@ -60,6 +63,49 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
 .updated-at { color: #8294a9; }
 .error-message { color: #f0a6a6; }
 
+.resources-section { max-width: 1180px; margin: 0 auto; padding: 86px 32px 110px; border-top: 1px solid #29435a; animation: rise-in .7s .2s ease both; }
+.resources-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; }
+.resources-heading h2 { font-size: clamp(2.2rem, 5vw, 4rem); }
+.section-copy { max-width: 620px; margin: 18px 0 0; color: #aebdcd; font-family: 'Segoe UI', sans-serif; line-height: 1.6; }
+.button { border: 0; border-radius: 2px; padding: 12px 16px; font-family: 'Segoe UI', sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .04em; cursor: pointer; }
+.button:disabled { cursor: wait; opacity: .55; }
+.button--primary { color: #0b1324; background: #f4b860; }
+.button--quiet { color: #c7d4e2; background: #20374c; }
+.resource-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; margin: 42px 0 24px; padding: 16px; border: 1px solid #29435a; background: rgba(13, 28, 46, .62); }
+.resource-toolbar label, .resource-form label { display: grid; gap: 7px; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
+.resource-toolbar input, .resource-toolbar select, .resource-form input:not([type='checkbox']), .resource-form select, .resource-form textarea { min-width: 150px; border: 1px solid #3a566d; border-radius: 2px; padding: 10px 11px; color: #e8eef5; background: #112237; font: inherit; font-size: .85rem; letter-spacing: 0; text-transform: none; }
+.resource-toolbar input:focus, .resource-toolbar select:focus, .resource-form input:focus, .resource-form select:focus, .resource-form textarea:focus { outline: 2px solid #f4b860; outline-offset: 1px; }
+.toolbar-checkbox, .checkbox-label { display: flex !important; align-items: center; gap: 8px !important; padding-bottom: 11px; color: #c7d4e2 !important; letter-spacing: 0 !important; text-transform: none !important; }
+.toolbar-checkbox input, .checkbox-label input { accent-color: #f4b860; }
+.resource-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.resource-card { padding: 22px; border: 1px solid #29435a; background: rgba(13, 28, 46, .82); }
+.resource-card__top, .resource-card__footer { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.resource-type { margin: 0 0 7px; color: #f4b860; font-family: 'Segoe UI', sans-serif; font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.resource-card h3, .resource-form h3, .empty-state h3 { margin: 0; color: #f4f7fb; font-size: 1.35rem; font-weight: 400; }
+.resource-status { padding: 5px 8px; font-family: 'Segoe UI', sans-serif; font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.resource-status--active { color: #9be2c1; background: rgba(97, 197, 156, .12); }
+.resource-status--inactive { color: #f0a6a6; background: rgba(224, 107, 107, .12); }
+.resource-status--unknown { color: #f4d08e; background: rgba(244, 184, 96, .12); }
+.resource-details { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 22px; color: #aebdcd; font-family: 'Segoe UI', sans-serif; font-size: .78rem; }
+.resource-details span + span { padding-left: 18px; border-left: 1px solid #3a566d; }
+.resource-description { margin: 18px 0 0; color: #c7d4e2; font-family: 'Segoe UI', sans-serif; font-size: .86rem; line-height: 1.5; }
+.resource-card__footer { align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #20374c; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .72rem; }
+.text-button { padding: 0; border: 0; color: #f4b860; background: transparent; font: inherit; cursor: pointer; }
+.text-button + .text-button { margin-left: 16px; }
+.text-button--danger { color: #f0a6a6; }
+.resource-form { max-width: 700px; margin: 24px 0; padding: 24px; border: 1px solid #f4b860; background: #10243a; }
+.form-heading { margin-bottom: 22px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.resource-form > label { margin-top: 16px; }
+.resource-form textarea { resize: vertical; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.form-error, .inline-error, .success-message { font-family: 'Segoe UI', sans-serif; font-size: .82rem; }
+.form-error, .inline-error { color: #f0a6a6; }
+.success-message { color: #9be2c1; }
+.inline-error { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 18px 0; padding: 12px 14px; border: 1px solid rgba(224, 107, 107, .35); background: rgba(224, 107, 107, .08); }
+.empty-state { padding: 46px 24px; border: 1px dashed #3a566d; color: #aebdcd; text-align: center; font-family: 'Segoe UI', sans-serif; }
+.empty-state p { margin: 10px 0 22px; }
+
 @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 700px) {
@@ -70,4 +116,12 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
   .intro-copy { font-size: 1.05rem; }
   .intro-rule { margin-top: 42px; }
   .system-panel { margin-top: 56px; }
+  .resources-section { padding: 66px 20px 80px; }
+  .resources-heading { display: block; }
+  .resources-heading .button { margin-top: 24px; }
+  .resource-toolbar { display: grid; grid-template-columns: 1fr 1fr; }
+  .resource-toolbar label:nth-child(3) { grid-column: 1 / -1; }
+  .resource-list { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .topbar-nav { gap: 12px; }
 }
