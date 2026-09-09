@@ -20,9 +20,18 @@ if (!mongodbUri) {
   throw new Error('MONGODB_URI is required.');
 }
 
+const ollamaTimeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS ?? 60000);
+
+if (!Number.isInteger(ollamaTimeoutMs) || ollamaTimeoutMs <= 0) {
+  throw new Error('OLLAMA_TIMEOUT_MS must be a positive integer.');
+}
+
 export const env = {
   nodeEnvironment: nodeEnvironment as NodeEnvironment,
   port,
   mongodbUri,
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173'
+  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434',
+  ollamaModel: process.env.OLLAMA_MODEL ?? 'llama3.2',
+  ollamaTimeoutMs
 } as const;

@@ -99,7 +99,9 @@ Phase 6 snapshots Phase 5 predictions, derives observations only from relevant s
 
 ## Incident Intelligence
 
-Status: Planned
+Status: Implemented
+
+Phase 7 provides an optional evidence-backed AI reasoning layer with replaceable providers, bounded deterministic context, structured response validation, persisted investigations, RCA hypotheses, and advisory recommendations. AI remains non-authoritative and Ollama is optional.
 
 Correlate recent changes, deployments, metrics, logs, Kubernetes events, Git history, dependencies and historical incidents.
 

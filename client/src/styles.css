@@ -194,6 +194,25 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
 .reality-stats span { align-self: center; color: #d5dfeb; font-size: .8rem; }
 .evidence-state { color: #9be2c1; font-weight: 700; letter-spacing: .08em; }
 
+.investigation-section { max-width: 1180px; margin: 0 auto; padding: 86px 32px 110px; border-top: 1px solid #29435a; }
+.investigation-heading { margin-bottom: 34px; }
+.investigation-heading h2 { font-size: clamp(2.2rem, 5vw, 4rem); }
+.investigation-toolbar { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 20px; padding: 16px; border: 1px solid #29435a; background: rgba(13, 28, 46, .62); }
+.investigation-toolbar label { display: grid; gap: 7px; flex: 1; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
+.investigation-toolbar select { min-width: 0; border: 1px solid #3a566d; border-radius: 2px; padding: 10px 11px; color: #e8eef5; background: #112237; font: inherit; font-size: .85rem; }
+.provider-warning { margin: 18px 0; padding: 13px 16px; border: 1px solid #f4b860; color: #f4d08e; background: rgba(244, 184, 96, .08); font-family: 'Segoe UI', sans-serif; font-size: .82rem; }
+.investigation-detail { margin-top: 20px; }
+.ai-label { color: #8ea8d1; font-family: 'Segoe UI', sans-serif; font-size: .7rem; font-weight: 700; letter-spacing: .1em; }
+.ai-card { margin: 14px 0; padding: 20px; border: 1px solid #29435a; background: #10243a; color: #c7d4e2; font-family: 'Segoe UI', sans-serif; }
+.ai-card--error { border-color: #e06b6b; }
+.ai-card h3 { margin: 0 0 12px; color: #f4f7fb; font-family: Georgia, serif; font-size: 1.2rem; font-weight: 400; }
+.ai-card p { font-size: .82rem; line-height: 1.55; }
+.ai-card a { color: #f4b860; overflow-wrap: anywhere; }
+.ai-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.ai-item { padding: 11px 0; border-bottom: 1px solid #29435a; }
+.ai-item strong { color: #f4f7fb; }
+.ai-item small { color: #8294a9; font-size: .72rem; }
+
 @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 700px) {
@@ -233,4 +252,8 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
   .reality-toolbar, .reality-actions { display: block; }
   .reality-toolbar .button, .reality-actions .button { margin-top: 14px; }
   .reality-actions label + label { margin-top: 14px; }
+  .investigation-section { padding: 66px 20px 80px; }
+  .investigation-toolbar { display: block; }
+  .investigation-toolbar .button { margin-top: 14px; }
+  .ai-grid { grid-template-columns: 1fr; }
 }

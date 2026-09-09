@@ -16,6 +16,20 @@ This keeps development, testing and deployment simpler.
 
 Microservices can be considered later if there is a demonstrated need.
 
+## ADR-012 - Evidence-Backed AI Provider Boundary
+
+Status: Accepted
+
+### Decision
+
+Phase 7 uses a replaceable AI provider interface behind a deterministic bounded context builder and strict structured-response validator. Ollama is optional and accessed only over HTTP; MongoDB/server startup does not depend on it. Failed or unavailable provider calls persist failed investigation state and never fabricate an RCA.
+
+AI may explain supplied facts, generate hypotheses, and offer advisory recommendations, but deterministic ChangeLens resources, dependencies, risk, blast radius, evidence, and prediction comparisons remain authoritative.
+
+### Reason
+
+The AI layer must remain evidence-backed, bounded, replaceable, and safe before future remediation or advanced intelligence phases.
+
 ## ADR-011 - Prediction Versus Reality Semantics
 
 Status: Accepted

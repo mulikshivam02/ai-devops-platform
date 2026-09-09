@@ -5,6 +5,7 @@ import type { Change, ChangeFilters, ChangeInput, ChangeStatus } from '../types/
 import type { Dependency, DependencyFilters, DependencyGraph, DependencyInput } from '../types/dependency';
 import type { ChangeAnalysis } from '../types/changeAnalysis';
 import type { ObservedImpact, PredictionComparison, PredictionSnapshot } from '../types/predictionReality';
+import type { Investigation } from '../types/investigation';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -178,3 +179,7 @@ export function createObservation(changeId: string, input: { predictionId: strin
 export function listObservations(changeId: string): Promise<ObservedImpact[]> { return request<ObservedImpact[]>(`/changes/${changeId}/observations`); }
 export function comparePrediction(changeId: string, input: { predictionId: string; observationId: string }): Promise<PredictionComparison> { return request<PredictionComparison>(`/changes/${changeId}/compare`, { method: 'POST', body: JSON.stringify(input) }); }
 export function getComparison(changeId: string): Promise<PredictionComparison> { return request<PredictionComparison>(`/changes/${changeId}/comparison`); }
+export function investigateChange(changeId: string): Promise<Investigation> { return request<Investigation>(`/changes/${changeId}/investigate`, { method: 'POST' }); }
+export function listInvestigations(changeId: string): Promise<Investigation[]> { return request<Investigation[]>(`/changes/${changeId}/investigations`); }
+export function getInvestigation(id: string): Promise<Investigation> { return request<Investigation>(`/investigations/${id}`); }
+export function getAIHealth(): Promise<{ available: boolean; provider: string; model: string; message: string }> { return request('/ai/health'); }
