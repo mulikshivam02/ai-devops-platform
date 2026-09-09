@@ -129,9 +129,11 @@ AI investigation context includes only bounded finding fields, evidence IDs, con
 
 ## Remediation
 
-Status: Planned
+Status: Implemented
 
-Detect -> Analyze -> Recommend -> Generate Fix -> Validate -> Create PR -> Human Approval -> Execute -> Verify
+Phase 9 provides controlled, evidence-backed remediation proposals with structured allowlisted actions, deterministic lifecycle transitions, remediation risk, rollback representations, schema validation, prepared PR information without GitHub API calls, explicit human approval, dry-run execution, evidence-required verification, and audit history.
+
+The dry-run executor never invokes a shell, script, kubectl, Terraform, Docker, cloud API, or credential operation. Missing verification evidence produces insufficient evidence rather than success. AI may explain or suggest a proposal, but deterministic validation, risk, approval, and execution policy remain authoritative.
 
 ## Production Hardening
 

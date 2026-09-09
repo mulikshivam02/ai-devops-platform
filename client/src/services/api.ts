@@ -7,6 +7,7 @@ import type { ChangeAnalysis } from '../types/changeAnalysis';
 import type { ObservedImpact, PredictionComparison, PredictionSnapshot } from '../types/predictionReality';
 import type { Investigation } from '../types/investigation';
 import type { SecurityFinding, SecuritySummary, SecurityDependencyEdge } from '../types/security';
+import type { Remediation } from '../types/remediation';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -187,3 +188,6 @@ export function getAIHealth(): Promise<{ available: boolean; provider: string; m
 export function listSecurityFindings(filters: { severity?: string; category?: string; status?: string; source?: string; page?: number; limit?: number } = {}): Promise<{ data: SecurityFinding[]; pagination: Pagination }> { return requestPage<SecurityFinding[]>(`/security/findings${queryString(filters)}`); }
 export function getSecuritySummary(): Promise<SecuritySummary> { return request<SecuritySummary>('/security/summary'); }
 export function getSecurityFindingDependents(resourceId: string, depth = 10): Promise<SecurityDependencyEdge[]> { return request<SecurityDependencyEdge[]>(`/resources/${resourceId}/dependents?depth=${depth}`); }
+export function listRemediations(filters: { status?: string; type?: string; changeId?: string; resourceId?: string; page?: number; limit?: number } = {}): Promise<{ data: Remediation[]; pagination: Pagination }> { return requestPage<Remediation[]>(`/remediations${queryString(filters)}`); }
+export function getRemediation(id: string): Promise<Remediation> { return request<Remediation>(`/remediations/${id}`); }
+export function remediationAction(id: string, action: string, body: Record<string, unknown> = {}): Promise<Remediation> { return request<Remediation>(`/remediations/${id}/${action}`, { method: 'POST', body: JSON.stringify(body) }); }

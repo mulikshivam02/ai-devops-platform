@@ -170,6 +170,18 @@ Duplicate findings use a stable fingerprint and a unique database index. Securit
 
 Security analysis must remain reproducible and passive before real scanners and controlled remediation are introduced. AI may explain verified findings but cannot create or modify security facts.
 
+## ADR-014 - Controlled Remediation and Dry Run
+
+Status: Accepted
+
+### Decision
+
+Phase 9 persists remediation proposals as structured, allowlisted actions and moves them through a deterministic state machine. High-risk or production remediation requires explicit human approval. PR preparation is local structured data only; no GitHub API is called. The only execution implementation is a clearly marked dry-run executor that performs no host or external-system mutation. Verification requires separate observed Evidence and treats missing evidence as insufficient evidence.
+
+### Reason
+
+ChangeLens must assist with remediation while preventing AI or API callers from obtaining unrestricted production control. Every lifecycle event is auditable and deterministic policy remains authoritative.
+
 ## ADR-006 - Repository Name
 
 Status: Accepted
