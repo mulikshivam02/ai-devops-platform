@@ -20,6 +20,17 @@ if (!mongodbUri) {
   throw new Error('MONGODB_URI is required.');
 }
 
+const clientUrl = process.env.CLIENT_URL ?? process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+const authDisabled = process.env.AUTH_DISABLED === 'true';
+
+if (nodeEnvironment === 'production' && (!process.env.CLIENT_URL || authDisabled)) {
+  throw new Error('CLIENT_URL is required and AUTH_DISABLED must be false in production.');
+}
+
+const jwtSecret = process.env.JWT_SECRET ?? (nodeEnvironment === 'production' ? '' : 'development-only-change-lens-secret');
+if (nodeEnvironment === 'production' && jwtSecret.length < 32) throw new Error('JWT_SECRET must be at least 32 characters in production.');
+const jsonBodyLimit = process.env.JSON_BODY_LIMIT ?? '1mb';
+
 const ollamaTimeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS ?? 60000);
 
 if (!Number.isInteger(ollamaTimeoutMs) || ollamaTimeoutMs <= 0) {
@@ -30,7 +41,15 @@ export const env = {
   nodeEnvironment: nodeEnvironment as NodeEnvironment,
   port,
   mongodbUri,
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  clientUrl,
+  corsOrigin: clientUrl,
+  authDisabled: authDisabled || nodeEnvironment === 'test',
+  jwtSecret,
+  allowPublicRegistration: process.env.ALLOW_PUBLIC_REGISTRATION === 'true' && nodeEnvironment !== 'production',
+  initialAdminEmail: process.env.INITIAL_ADMIN_EMAIL,
+  initialAdminPassword: process.env.INITIAL_ADMIN_PASSWORD,
+  jsonBodyLimit,
+  appVersion: process.env.APP_VERSION ?? '0.1.0',
   ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434',
   ollamaModel: process.env.OLLAMA_MODEL ?? 'llama3.2',
   ollamaTimeoutMs

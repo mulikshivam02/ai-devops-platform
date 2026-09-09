@@ -28,6 +28,10 @@ interface ApiResponse<T> {
   pagination?: Pagination;
 }
 
+export interface AuthUser { id: string; email: string; role: 'viewer' | 'operator' | 'admin'; active: boolean; createdAt: string; }
+export function setAuthToken(token: string | null): void { if (token) localStorage.setItem('changelens_token', token); else localStorage.removeItem('changelens_token'); }
+function authHeaders(): HeadersInit { const token = localStorage.getItem('changelens_token'); return token ? { Authorization: `Bearer ${token}` } : {}; }
+
 export interface Pagination {
   page: number;
   limit: number;
@@ -37,20 +41,22 @@ export interface Pagination {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders(), ...(options?.headers ?? {}) },
     ...options
   });
-  const body = (await response.json().catch(() => null)) as { data?: T; error?: string } | null;
+  const body = (await response.json().catch(() => null)) as { data?: T; error?: string | { message?: string } } | null;
   if (!response.ok) {
-    throw new Error(body?.error ?? `Request failed with status ${response.status}.`);
+    const error = body?.error; const message = typeof error === 'string' ? error : error && typeof error === 'object' && 'message' in error ? String(error.message) : `Request failed with status ${response.status}.`;
+    if (response.status === 401) setAuthToken(null);
+    throw new Error(message);
   }
   return (body as ApiResponse<T>).data;
 }
 
 async function requestPage<T>(path: string): Promise<{ data: T; pagination: Pagination }> {
-  const response = await fetch(`${apiBaseUrl}${path}`);
-  const body = (await response.json().catch(() => null)) as ApiResponse<T> | { error?: string } | null;
-  if (!response.ok) throw new Error(body && 'error' in body ? body.error ?? `Request failed with status ${response.status}.` : `Request failed with status ${response.status}.`);
+  const response = await fetch(`${apiBaseUrl}${path}`, { headers: authHeaders() });
+  const body = (await response.json().catch(() => null)) as ApiResponse<T> | { error?: string | { message?: string } } | null;
+  if (!response.ok) { const error = body && 'error' in body ? body.error : undefined; const message = typeof error === 'string' ? error : error && typeof error === 'object' && 'message' in error ? String(error.message) : `Request failed with status ${response.status}.`; throw new Error(message); }
   if (!body || !('pagination' in body) || !body.pagination) throw new Error('The API returned invalid pagination data.');
   return { data: body.data, pagination: body.pagination };
 }
@@ -186,6 +192,9 @@ export function investigateChange(changeId: string): Promise<Investigation> { re
 export function listInvestigations(changeId: string): Promise<Investigation[]> { return request<Investigation[]>(`/changes/${changeId}/investigations`); }
 export function getInvestigation(id: string): Promise<Investigation> { return request<Investigation>(`/investigations/${id}`); }
 export function getAIHealth(): Promise<{ available: boolean; provider: string; model: string; message: string }> { return request('/ai/health'); }
+export async function login(email: string, password: string): Promise<AuthUser> { const result = await request<{ user: AuthUser; token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }); setAuthToken(result.token); return result.user; }
+export function logout(): Promise<null> { setAuthToken(null); return request<null>('/auth/logout', { method: 'POST' }); }
+export function currentUser(): Promise<AuthUser> { return request<AuthUser>('/auth/me'); }
 export function listSecurityFindings(filters: { severity?: string; category?: string; status?: string; source?: string; page?: number; limit?: number } = {}): Promise<{ data: SecurityFinding[]; pagination: Pagination }> { return requestPage<SecurityFinding[]>(`/security/findings${queryString(filters)}`); }
 export function getSecuritySummary(): Promise<SecuritySummary> { return request<SecuritySummary>('/security/summary'); }
 export function getSecurityFindingDependents(resourceId: string, depth = 10): Promise<SecurityDependencyEdge[]> { return request<SecurityDependencyEdge[]>(`/resources/${resourceId}/dependents?depth=${depth}`); }

@@ -1,0 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import request from 'supertest';
+const service = vi.hoisted(() => ({ registerUser: vi.fn(), loginUser: vi.fn(), getUser: vi.fn() }));
+vi.mock('../src/services/auth.service.js', async () => { const actual = await vi.importActual<typeof import('../src/services/auth.service.js')>('../src/services/auth.service.js'); return { ...actual, ...service }; });
+const { app } = await import('../src/server.js');
+const user = { id: '507f1f77bcf86cd799439011', email: 'operator@example.com', role: 'operator', active: true, createdAt: '2026-09-09T00:00:00.000Z' };
+describe('authentication boundary', () => { beforeEach(() => { vi.clearAllMocks(); service.registerUser.mockResolvedValue({ user, token: 'signed-token' }); service.loginUser.mockResolvedValue({ user, token: 'signed-token' }); service.getUser.mockResolvedValue(user); });
+	it('supports login/register/logout without returning password data', async () => { const register = await request(app).post('/api/auth/register').send({ email: user.email, password: 'long-development-password' }); expect(register.status).toBe(201); expect(register.body.data.user).toEqual(user); expect(register.body.data.user.passwordHash).toBeUndefined(); const login = await request(app).post('/api/auth/login').send({ email: user.email, password: 'long-development-password' }); expect(login.status).toBe(200); expect(login.body.data.token).toBe('signed-token'); expect((await request(app).post('/api/auth/logout')).status).toBe(200); });
+	it('keeps authenticated user identity separate from credentials', async () => { const response = await request(app).get('/api/auth/me'); expect(response.status).toBe(200); expect(response.body.data).toEqual(user); expect(JSON.stringify(response.body)).not.toContain('passwordHash'); });
+});
