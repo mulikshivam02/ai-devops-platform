@@ -7,12 +7,18 @@ import { errorHandler } from './middleware/error.middleware.js';
 import { notFoundHandler } from './middleware/not-found.middleware.js';
 import { healthRouter } from './routes/health.routes.js';
 import { resourceRouter } from './routes/resourceRoutes.js';
+import { changeRouter, resourceChangeRouter } from './routes/changeRoutes.js';
+import { evidenceRouter, resourceEvidenceRouter } from './routes/evidenceRoutes.js';
 
 export const app = express();
 
 app.use(cors({ origin: env.corsOrigin }));
 app.use(express.json());
 app.use('/api/health', healthRouter);
+app.use('/api/evidence', evidenceRouter);
+app.use('/api/changes', changeRouter);
+app.use('/api/resources/:resourceId/evidence', resourceEvidenceRouter);
+app.use('/api/resources/:resourceId/changes', resourceChangeRouter);
 app.use('/api/resources', resourceRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);

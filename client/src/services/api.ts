@@ -1,5 +1,7 @@
 import type { HealthStatus } from '../types/health';
 import type { Resource, ResourceFilters, ResourceInput } from '../types/resource';
+import type { Evidence, EvidenceFilters, EvidenceInput } from '../types/evidence';
+import type { Change, ChangeFilters, ChangeInput, ChangeStatus } from '../types/change';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -16,6 +18,14 @@ export async function fetchHealth(): Promise<HealthStatus> {
 interface ApiResponse<T> {
   success: boolean;
   data: T;
+  pagination?: Pagination;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -28,6 +38,14 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(body?.error ?? `Request failed with status ${response.status}.`);
   }
   return (body as ApiResponse<T>).data;
+}
+
+async function requestPage<T>(path: string): Promise<{ data: T; pagination: Pagination }> {
+  const response = await fetch(`${apiBaseUrl}${path}`);
+  const body = (await response.json().catch(() => null)) as ApiResponse<T> | { error?: string } | null;
+  if (!response.ok) throw new Error(body && 'error' in body ? body.error ?? `Request failed with status ${response.status}.` : `Request failed with status ${response.status}.`);
+  if (!body || !('pagination' in body) || !body.pagination) throw new Error('The API returned invalid pagination data.');
+  return { data: body.data, pagination: body.pagination };
 }
 
 export async function listResources(filters: ResourceFilters = {}): Promise<Resource[]> {
@@ -54,4 +72,51 @@ export function updateResource(id: string, input: Partial<ResourceInput>): Promi
 
 export function deleteResource(id: string): Promise<null> {
   return request<null>(`/resources/${id}`, { method: 'DELETE' });
+}
+
+function queryString(values: object): string {
+  const params = new URLSearchParams();
+  (Object.entries(values) as [string, string | number | undefined][]).forEach(([key, value]) => { if (value !== undefined && value !== '') params.set(key, String(value)); });
+  const query = params.toString();
+  return query ? `?${query}` : '';
+}
+
+export function listEvidence(filters: EvidenceFilters = {}): Promise<{ data: Evidence[]; pagination: Pagination }> {
+  return requestPage<Evidence[]>(`/evidence${queryString(filters)}`);
+}
+
+export function getEvidence(id: string): Promise<Evidence> {
+  return request<Evidence>(`/evidence/${id}`);
+}
+
+export function getResourceEvidence(resourceId: string, page = 1, limit = 25): Promise<{ data: Evidence[]; pagination: Pagination }> {
+  return requestPage<Evidence[]>(`/resources/${resourceId}/evidence?page=${page}&limit=${limit}`);
+}
+
+export function createEvidence(input: EvidenceInput): Promise<Evidence> {
+  return request<Evidence>('/evidence', { method: 'POST', body: JSON.stringify(input) });
+}
+
+export function deleteEvidence(id: string): Promise<null> {
+  return request<null>(`/evidence/${id}`, { method: 'DELETE' });
+}
+
+export function listChanges(filters: ChangeFilters = {}): Promise<{ data: Change[]; pagination: Pagination }> {
+  return requestPage<Change[]>(`/changes${queryString(filters)}`);
+}
+
+export function getChange(id: string): Promise<Change> {
+  return request<Change>(`/changes/${id}`);
+}
+
+export function getResourceChanges(resourceId: string, page = 1, limit = 25): Promise<{ data: Change[]; pagination: Pagination }> {
+  return requestPage<Change[]>(`/resources/${resourceId}/changes?page=${page}&limit=${limit}`);
+}
+
+export function createChange(input: ChangeInput): Promise<Change> {
+  return request<Change>('/changes', { method: 'POST', body: JSON.stringify(input) });
+}
+
+export function updateChangeStatus(id: string, status: ChangeStatus): Promise<Change> {
+  return request<Change>(`/changes/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
 }

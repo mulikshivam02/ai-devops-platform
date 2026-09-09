@@ -24,7 +24,9 @@ Resources include repositories, pull requests, commits, workflows, deployments, 
 
 ## Evidence Engine
 
-Status: Planned
+Status: Implemented
+
+Phase 3 stores and retrieves manually supplied, timestamped evidence with resource references, source/type classification, filtering, pagination, and redacted structured display. Live external collectors remain future work.
 
 Collect and normalize evidence from external systems.
 
@@ -35,6 +37,12 @@ Evidence should contain:
 - timestamp
 - value
 - metadata
+
+## Change History
+
+Status: Implemented
+
+Phase 3 records manually supplied change history with deterministic classifications, evidence ID references, filtering, pagination, and explicit status updates. Risk, impact, prediction, and analysis remain future work.
 
 ## Dependency Graph
 

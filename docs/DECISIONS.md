@@ -16,6 +16,20 @@ This keeps development, testing and deployment simpler.
 
 Microservices can be considered later if there is a demonstrated need.
 
+## ADR-008 - Evidence and Change History Foundations
+
+Status: Accepted
+
+### Decision
+
+Phase 3 stores observed evidence and manually supplied change history as separate MongoDB records. Evidence and changes reference resources by ID, and changes reference evidence by ID without duplicating evidence documents.
+
+Payloads and metadata are sanitized for obvious sensitive keys at write and response boundaries. This is a practical redaction layer, not a guarantee that arbitrary external data is perfectly safe.
+
+### Reason
+
+ChangeLens needs a durable, deterministic record of observations before collectors, analysis, prediction, or AI reasoning are introduced.
+
 ## ADR-007 - Resource Center Records
 
 Status: Accepted
