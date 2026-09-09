@@ -1,0 +1,12 @@
+import { Schema, Types, model, type HydratedDocument } from 'mongoose';
+import { sanitizeObject } from '../utils/sensitive-data.js';
+import type { AdvancedInsightDTO, HistoricalPattern } from '../intelligence/intelligence.types.js';
+
+export interface AdvancedInsightDocument { type: string; title: string; description: string; severity: string; confidence: number; resourceIds: Types.ObjectId[]; changeIds: Types.ObjectId[]; evidenceIds: Types.ObjectId[]; supportingPatterns: HistoricalPattern[]; recommendation: string; status: 'active' | 'acknowledged' | 'resolved' | 'dismissed' | 'unknown'; metadata: Record<string, unknown>; createdAt: Date; updatedAt: Date; }
+const schema = new Schema<AdvancedInsightDocument>({ type: { type: String, required: true, index: true }, title: { type: String, required: true, maxlength: 240 }, description: { type: String, required: true, maxlength: 2000 }, severity: { type: String, required: true }, confidence: { type: Number, min: 0, max: 100, required: true }, resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }], changeIds: [{ type: Schema.Types.ObjectId, ref: 'Change' }], evidenceIds: [{ type: Schema.Types.ObjectId, ref: 'Evidence' }], supportingPatterns: { type: Schema.Types.Mixed, default: [] }, recommendation: { type: String, required: true, maxlength: 1000 }, status: { type: String, enum: ['active', 'acknowledged', 'resolved', 'dismissed', 'unknown'], default: 'active', index: true }, metadata: { type: Schema.Types.Mixed, default: {} } }, { timestamps: true });
+schema.index({ resourceIds: 1, createdAt: -1 });
+schema.index({ changeIds: 1, createdAt: -1 });
+schema.index({ severity: 1, createdAt: -1 });
+export type AdvancedInsightHydratedDocument = HydratedDocument<AdvancedInsightDocument>;
+export const AdvancedInsightModel = model<AdvancedInsightDocument>('AdvancedInsight', schema);
+export function toAdvancedInsightDTO(document: AdvancedInsightHydratedDocument): AdvancedInsightDTO { return { id: document._id.toString(), type: document.type, title: document.title, description: document.description, severity: document.severity, confidence: document.confidence, resourceIds: document.resourceIds.map((id) => id.toString()), changeIds: document.changeIds.map((id) => id.toString()), evidenceIds: document.evidenceIds.map((id) => id.toString()), supportingPatterns: document.supportingPatterns, recommendation: document.recommendation, status: document.status, metadata: sanitizeObject(document.metadata), createdAt: document.createdAt.toISOString(), updatedAt: document.updatedAt.toISOString() }; }

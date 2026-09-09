@@ -182,6 +182,18 @@ Phase 9 persists remediation proposals as structured, allowlisted actions and mo
 
 ChangeLens must assist with remediation while preventing AI or API callers from obtaining unrestricted production control. Every lifecycle event is auditable and deterministic policy remains authoritative.
 
+## ADR-015 - Deterministic Historical Intelligence
+
+Status: Accepted
+
+### Decision
+
+Phase 10 derives historical outcomes, similarity, trends, prediction accuracy, bias, patterns, and insights from existing persisted Phase 1-9 records. Results are bounded, explainable, and carry sample size, confidence, limitations, and evidence references. Historical associations never create current security findings or assert causation.
+
+### Reason
+
+ChangeLens needs operational memory without opaque machine learning or unsupported claims. Deterministic analytics provide reproducible context that AI can explain but cannot override.
+
 ## ADR-006 - Repository Name
 
 Status: Accepted

@@ -8,6 +8,7 @@ import { PredictionRealityPage } from './pages/PredictionRealityPage';
 import { InvestigationPage } from './pages/InvestigationPage';
 import { SecurityIntelligencePage } from './pages/SecurityIntelligencePage';
 import { RemediationPage } from './pages/RemediationPage';
+import { IntelligencePage } from './pages/IntelligencePage';
 import './styles.css';
 
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
           <span className="brand-mark" aria-hidden="true">C</span>
           <span>ChangeLens</span>
         </a>
-        <nav className="topbar-nav"><a href="#resources">Resources</a><a href="#evidence">Evidence</a><a href="#history">History</a><a href="#dependency-graph">Graph</a><a href="#change-intelligence">Intelligence</a><a href="#security">Security</a><a href="#remediation">Remediation</a><a href="#prediction-reality">Reality</a><a href="#investigation">RCA</a><span className="topbar-label">Platform foundation</span></nav>
+        <nav className="topbar-nav"><a href="#resources">Resources</a><a href="#evidence">Evidence</a><a href="#history">History</a><a href="#dependency-graph">Graph</a><a href="#change-intelligence">Intelligence</a><a href="#security">Security</a><a href="#intelligence-dashboard">Memory</a><a href="#remediation">Remediation</a><a href="#prediction-reality">Reality</a><a href="#investigation">RCA</a><span className="topbar-label">Platform foundation</span></nav>
       </header>
       <HomePage />
       <ResourcesPage />
@@ -30,6 +31,7 @@ export default function App() {
       <InvestigationPage />
       <SecurityIntelligencePage />
       <RemediationPage />
+      <IntelligencePage />
     </>
   );
 }

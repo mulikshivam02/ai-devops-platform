@@ -109,11 +109,11 @@ Generate evidence-backed root-cause analysis.
 
 ## Historical Intelligence
 
-Status: Planned
+Status: Implemented
 
-Store changes, predictions, deployments, observed impact, incidents, root causes, remediation and verification.
+Phase 10 provides bounded deterministic historical intelligence over persisted changes, analyses, observations, comparisons, security findings, dependency relationships, and remediations. It calculates explainable similarity, evidence-backed outcomes, recurring patterns, risk trends, prediction accuracy, prediction bias, remediation performance, and proactive insight status.
 
-Use history to improve future analysis.
+Missing history or observations return `insufficient_evidence`; historical associations do not establish causation and do not create current SecurityFindings. The AI context receives only bounded summaries and source evidence IDs.
 
 ## Security Intelligence
 

@@ -8,6 +8,7 @@ import type { ObservedImpact, PredictionComparison, PredictionSnapshot } from '.
 import type { Investigation } from '../types/investigation';
 import type { SecurityFinding, SecuritySummary, SecurityDependencyEdge } from '../types/security';
 import type { Remediation } from '../types/remediation';
+import type { AdvancedInsight, IntelligenceOverview } from '../types/intelligence';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -191,3 +192,6 @@ export function getSecurityFindingDependents(resourceId: string, depth = 10): Pr
 export function listRemediations(filters: { status?: string; type?: string; changeId?: string; resourceId?: string; page?: number; limit?: number } = {}): Promise<{ data: Remediation[]; pagination: Pagination }> { return requestPage<Remediation[]>(`/remediations${queryString(filters)}`); }
 export function getRemediation(id: string): Promise<Remediation> { return request<Remediation>(`/remediations/${id}`); }
 export function remediationAction(id: string, action: string, body: Record<string, unknown> = {}): Promise<Remediation> { return request<Remediation>(`/remediations/${id}/${action}`, { method: 'POST', body: JSON.stringify(body) }); }
+export function getIntelligenceOverview(): Promise<IntelligenceOverview> { return request<IntelligenceOverview>('/intelligence/overview'); }
+export function listIntelligenceInsights(filters: { status?: string; page?: number; limit?: number } = {}): Promise<{ data: AdvancedInsight[]; pagination: Pagination }> { return requestPage<AdvancedInsight[]>(`/intelligence/insights${queryString(filters)}`); }
+export function updateIntelligenceInsight(id: string, action: 'acknowledge' | 'dismiss'): Promise<AdvancedInsight> { return request<AdvancedInsight>(`/intelligence/insights/${id}/${action}`, { method: 'POST' }); }

@@ -1,0 +1,21 @@
+import type { RequestHandler } from 'express';
+import { getChangeHistory, getDependencyPatterns, getHistoricalOutcomes, getHistoricalRisk, getInsight, getPatterns, getPredictionAccuracyHistory, getSecurityPatterns, getSimilarHistory, listInsights, overview, predictionBias, remediationPerformance, updateInsightStatus } from './historical-intelligence.service.js';
+import { parsePagination, parseQueryString, pathString } from '../utils/request-validation.js';
+import { AppError } from '../utils/app-error.js';
+
+function windowDays(value: unknown): number | undefined { const parsed = parseQueryString(value, 'window'); if (!parsed || parsed === 'all') return undefined; if (!['7', '30', '90'].includes(parsed)) throw new AppError(400, 'window must be 7, 30, 90, or all.'); return Number(parsed); }
+export const getOverview: RequestHandler = async (_request, response) => response.status(200).json({ success: true, data: await overview() });
+export const getSimilar: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await getSimilarHistory(pathString(request.params.changeId, 'changeId')) });
+export const getChangeHistoryController: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await getChangeHistory(pathString(request.params.changeId, 'changeId')) });
+export const getResourceHistory: RequestHandler = async (request, response) => { const { page, limit } = parsePagination(request.query as Record<string, unknown>); const data = await getHistoricalOutcomes(pathString(request.params.resourceId, 'resourceId'), page * limit); response.status(200).json({ success: true, data: data.slice((page - 1) * limit, page * limit), pagination: { page, limit, total: data.length, pages: Math.ceil(data.length / limit) } }); };
+export const getRiskTrends: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await getHistoricalRisk(pathString(request.params.resourceId, 'resourceId'), windowDays(request.query.window)) });
+export const getPredictionAccuracy: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await getPredictionAccuracyHistory(pathString(request.params.resourceId, 'resourceId')) });
+export const getPatternsController: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await getPatterns(parseQueryString(request.query.resourceId, 'resourceId')) });
+export const getInsights: RequestHandler = async (request, response) => { const { page, limit } = parsePagination(request.query as Record<string, unknown>); const result = await listInsights(page, limit, parseQueryString(request.query.status, 'status')); response.status(200).json({ success: true, data: result.data, pagination: result.pagination }); };
+export const getInsightController: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await getInsight(pathString(request.params.id, 'id')) });
+export const acknowledgeInsight: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await updateInsightStatus(pathString(request.params.id, 'id'), 'acknowledged') });
+export const dismissInsight: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await updateInsightStatus(pathString(request.params.id, 'id'), 'dismissed') });
+export const getRemediationPerformance: RequestHandler = async (_request, response) => response.status(200).json({ success: true, data: await remediationPerformance() });
+export const getSecurityPatternsController: RequestHandler = async (_request, response) => response.status(200).json({ success: true, data: await getSecurityPatterns() });
+export const getDependencyPatternsController: RequestHandler = async (_request, response) => response.status(200).json({ success: true, data: await getDependencyPatterns() });
+export const getPredictionBias: RequestHandler = async (request, response) => response.status(200).json({ success: true, data: await predictionBias(pathString(request.params.resourceId, 'resourceId')) });

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { MockAIProvider } from '../src/ai/mockProvider.js';
 import { projectSecurityContext } from '../src/ai/contextBuilder.js';
 import { summarizeSecurityBlastRadius } from '../src/engines/securityBlastRadiusEngine.js';
+import { buildInvestigationPrompt } from '../src/ai/promptBuilder.js';
 
 describe('security investigation context', () => {
   it('includes bounded deterministic security facts and dependency semantics', async () => {
@@ -11,7 +12,7 @@ describe('security investigation context', () => {
   });
 
   it('keeps AI behavior available without Ollama and does not create security facts', async () => {
-    const result = await new MockAIProvider().analyze({ type: 'change_analysis', context: { change: { id: 'c', summary: 'change', changeType: 'configuration', source: 'manual', resourceId: 'r', evidenceIds: ['e'] }, resource: { id: 'r', name: 'resource', type: 'kubernetes_cluster' }, dependencies: [], evidence: [], securityFindings: [], history: [] }, prompt: '{}' });
+    const result = await new MockAIProvider().analyze({ type: 'change_analysis', context: { change: { id: 'c', summary: 'change', changeType: 'configuration', source: 'manual', resourceId: 'r', evidenceIds: ['e'] }, resource: { id: 'r', name: 'resource', type: 'kubernetes_cluster' }, dependencies: [], evidence: [], securityFindings: [], historicalIntelligence: { similarChanges: [], riskTrend: { status: 'insufficient_evidence' }, predictionAccuracy: { status: 'insufficient_evidence' }, patterns: [] }, history: [] }, prompt: '{}' });
     expect(result.rootCause.evidenceIds).toEqual([]);
     expect(result.evidenceReferences).toEqual([]);
   });
@@ -21,4 +22,6 @@ describe('security investigation context', () => {
     expect(summarizeSecurityBlastRadius('a', edges, 10)).toEqual({ directDependents: ['b'], transitiveDependents: ['c', 'd'], dependencyDepth: 3, totalPotentiallyAffected: 4 });
     expect(summarizeSecurityBlastRadius('a', edges, 2).dependencyDepth).toBe(2);
   });
+
+  it('passes historical intelligence through the bounded AI prompt context', () => { const prompt = buildInvestigationPrompt({ type: 'change_analysis', context: { change: { id: 'c', summary: 'change', changeType: 'configuration', source: 'manual', resourceId: 'r', evidenceIds: ['e'] }, resource: { id: 'r', name: 'resource', type: 'service' }, dependencies: [], evidence: [], securityFindings: [], historicalIntelligence: { similarChanges: [{ changeId: 'old', similarityScore: 90, matchingFactors: ['same resource'], differences: [], outcome: 'degraded', evidenceIds: ['e-old'] }], riskTrend: { status: 'available', sampleSize: 2 }, predictionAccuracy: { status: 'available', sampleSize: 2 }, patterns: [] }, history: [] } }); expect(prompt).toContain('historicalIntelligence'); expect(prompt).toContain('e-old'); });
 });

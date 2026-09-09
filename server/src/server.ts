@@ -15,6 +15,7 @@ import { comparisonRouter, observationRouter, predictionRealityRouter, predictio
 import { aiHealthRouter, investigationByIdRouter, investigationRouter } from './routes/investigationRoutes.js';
 import { securityRouter, changeSecurityRouter, resourceSecurityRouter } from './routes/securityRoutes.js';
 import { remediationRouter } from './remediation/remediation.routes.js';
+import { intelligenceRouter } from './intelligence/intelligence.routes.js';
 
 export const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/comparisons', comparisonRouter);
 app.use('/api/ai/health', aiHealthRouter);
 app.use('/api/security', securityRouter);
 app.use('/api/remediations', remediationRouter);
+app.use('/api/intelligence', intelligenceRouter);
 app.use('/api/investigations', investigationByIdRouter);
 app.use('/api/resources/:resourceId/evidence', resourceEvidenceRouter);
 app.use('/api/resources/:resourceId', resourceSecurityRouter);
