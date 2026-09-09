@@ -3,6 +3,7 @@ import type { Resource, ResourceFilters, ResourceInput } from '../types/resource
 import type { Evidence, EvidenceFilters, EvidenceInput } from '../types/evidence';
 import type { Change, ChangeFilters, ChangeInput, ChangeStatus } from '../types/change';
 import type { Dependency, DependencyFilters, DependencyGraph, DependencyInput } from '../types/dependency';
+import type { ChangeAnalysis } from '../types/changeAnalysis';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -152,4 +153,20 @@ export function getResourceDependents(resourceId: string, depth = 1): Promise<De
 
 export function getResourceGraph(resourceId: string, depth = 1, direction: 'dependencies' | 'dependents' = 'dependencies'): Promise<DependencyGraph> {
   return request<DependencyGraph>(`/resources/${resourceId}/dependency-graph?depth=${depth}&direction=${direction}`);
+}
+
+export function analyzeChange(changeId: string): Promise<ChangeAnalysis> {
+  return request<ChangeAnalysis>(`/changes/${changeId}/analyze`, { method: 'POST' });
+}
+
+export function getChangeAnalysis(changeId: string): Promise<ChangeAnalysis> {
+  return request<ChangeAnalysis>(`/changes/${changeId}/analysis`);
+}
+
+export function listChangeAnalyses(filters: { changeId?: string; resourceId?: string; page?: number; limit?: number } = {}): Promise<{ data: ChangeAnalysis[]; pagination: Pagination }> {
+  return requestPage<ChangeAnalysis[]>(`/change-analyses${queryString(filters)}`);
+}
+
+export function getChangeAnalysisById(id: string): Promise<ChangeAnalysis> {
+  return request<ChangeAnalysis>(`/change-analyses/${id}`);
 }

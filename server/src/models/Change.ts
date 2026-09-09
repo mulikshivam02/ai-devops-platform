@@ -1,5 +1,5 @@
 import { Schema, Types, model, type HydratedDocument } from 'mongoose';
-import { sanitizeObject } from '../utils/sensitive-data.js';
+import { sanitizeObject, sanitizeStructured } from '../utils/sensitive-data.js';
 import type { ChangeDTO, ChangeStatus, ChangeType } from '../types/change.js';
 
 export interface ChangeDocument {
@@ -10,8 +10,8 @@ export interface ChangeDocument {
   timestamp: Date;
   summary: string;
   changeType: ChangeType;
-  before?: Record<string, unknown>;
-  after?: Record<string, unknown>;
+  before?: unknown;
+  after?: unknown;
   evidenceIds: Types.ObjectId[];
   deploymentId?: string;
   status: ChangeStatus;
@@ -56,8 +56,8 @@ export function toChangeDTO(change: ChangeHydratedDocument): ChangeDTO {
     timestamp: change.timestamp.toISOString(),
     summary: change.summary,
     changeType: change.changeType,
-    ...(change.before ? { before: sanitizeObject(change.before) } : {}),
-    ...(change.after ? { after: sanitizeObject(change.after) } : {}),
+    ...(change.before !== undefined ? { before: sanitizeStructured(change.before) } : {}),
+    ...(change.after !== undefined ? { after: sanitizeStructured(change.after) } : {}),
     evidenceIds: change.evidenceIds.map((id) => id.toString()),
     ...(change.deploymentId ? { deploymentId: change.deploymentId } : {}),
     status: change.status,

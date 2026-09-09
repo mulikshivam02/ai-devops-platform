@@ -56,7 +56,9 @@ Use the graph for dependency visualization, blast radius and impact analysis.
 
 ## Change Intelligence
 
-Status: Planned
+Status: Implemented
+
+Phase 5 provides deterministic analysis of recorded changes: normalized changed items, explicit and dependency-expanded affected resources, documented blast-radius counts, deterministic risk scoring, derived impact categories, rollback availability from existing Change data, and evidence references. It does not execute actions or use AI.
 
 Analyze Git commits, GitHub pull requests, Terraform plans, Kubernetes changes, configuration changes and deployments.
 

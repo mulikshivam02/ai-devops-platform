@@ -13,8 +13,8 @@ export interface Change {
   timestamp: string;
   summary: string;
   changeType: ChangeType;
-  before?: Record<string, unknown>;
-  after?: Record<string, unknown>;
+  before?: unknown;
+  after?: unknown;
   evidenceIds: string[];
   deploymentId?: string;
   status: ChangeStatus;
@@ -31,8 +31,8 @@ export interface ChangeInput {
   timestamp: string;
   summary: string;
   changeType: ChangeType;
-  before?: Record<string, unknown>;
-  after?: Record<string, unknown>;
+  before?: unknown;
+  after?: unknown;
   evidenceIds?: string[];
   deploymentId?: string;
   status?: ChangeStatus;

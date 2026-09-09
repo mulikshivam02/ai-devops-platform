@@ -10,6 +10,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function parseStructured(value: unknown, field: string): unknown {
+  if (value === undefined || value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return value;
+  if (Array.isArray(value) || isRecord(value)) return value;
+  throw new AppError(400, `${field} must be JSON data.`);
+}
+
 function enumValue<T extends string>(value: unknown, field: string, values: readonly T[]): T {
   const result = requiredString(value, field, 40);
   if (!values.includes(result as T)) throw new AppError(400, `${field} must be one of: ${values.join(', ')}.`);
@@ -20,8 +26,8 @@ function parseInput(body: unknown): CreateChangeInput {
   if (!isRecord(body)) throw new AppError(400, 'Request body must be a JSON object.');
   const unsupported = Object.keys(body).find((key) => !allowedFields.includes(key));
   if (unsupported) throw new AppError(400, `Unsupported change field: ${unsupported}.`);
-  const before = parseObject(body.before, 'before');
-  const after = parseObject(body.after, 'after');
+  const before = parseStructured(body.before, 'before');
+  const after = parseStructured(body.after, 'after');
   const metadata = parseObject(body.metadata, 'metadata');
   const timestamp = parseDate(body.timestamp, 'timestamp', true);
   let evidenceIds: string[] | undefined;

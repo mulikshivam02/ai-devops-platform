@@ -10,6 +10,7 @@ import { resourceRouter } from './routes/resourceRoutes.js';
 import { changeRouter, resourceChangeRouter } from './routes/changeRoutes.js';
 import { evidenceRouter, resourceEvidenceRouter } from './routes/evidenceRoutes.js';
 import { dependencyRouter, resourceDependencyRouter } from './routes/dependencyRoutes.js';
+import { changeAnalysisRouter, changeRouterAnalysis } from './routes/changeAnalysisRoutes.js';
 
 export const app = express();
 
@@ -19,9 +20,11 @@ app.use('/api/health', healthRouter);
 app.use('/api/evidence', evidenceRouter);
 app.use('/api/changes', changeRouter);
 app.use('/api/dependencies', dependencyRouter);
+app.use('/api/change-analyses', changeAnalysisRouter);
 app.use('/api/resources/:resourceId/evidence', resourceEvidenceRouter);
 app.use('/api/resources/:resourceId/changes', resourceChangeRouter);
 app.use('/api/resources/:resourceId', resourceDependencyRouter);
+app.use('/api/changes/:changeId', changeRouterAnalysis);
 app.use('/api/resources', resourceRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);

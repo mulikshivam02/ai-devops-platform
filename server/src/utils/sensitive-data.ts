@@ -14,3 +14,9 @@ function sanitizeValue(value: unknown): unknown {
   if (typeof value === 'object' && value !== null) return sanitizeObject(value);
   return value;
 }
+
+export function sanitizeStructured(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map((entry) => sanitizeStructured(entry));
+  if (typeof value === 'object' && value !== null) return sanitizeObject(value);
+  return value;
+}

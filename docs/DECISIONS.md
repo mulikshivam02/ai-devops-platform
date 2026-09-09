@@ -16,6 +16,20 @@ This keeps development, testing and deployment simpler.
 
 Microservices can be considered later if there is a demonstrated need.
 
+## ADR-010 - Deterministic Change Intelligence
+
+Status: Accepted
+
+### Decision
+
+Phase 5 persists one latest deterministic analysis per Change. Changed items are normalized from recorded before/after data or explicit metadata paths, affected resources come from the Change resource and Phase 4 graph, and risk is calculated by a pure weighted engine with scores from 0 to 100.
+
+Blast-radius `directCount` excludes the primary changed resource, `transitiveCount` contains unique graph-expanded resources, and `totalCount` includes the primary resource plus all unique direct and transitive resources. Analysis describes potential impact only; it does not claim an outage or execute remediation.
+
+### Reason
+
+Change Intelligence must remain reproducible and evidence-backed before AI reasoning, live collectors, prediction validation, or remediation are introduced.
+
 ## ADR-009 - Explicit Dependency Graph Direction
 
 Status: Accepted

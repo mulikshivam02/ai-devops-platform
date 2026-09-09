@@ -5,7 +5,7 @@ import { ResourceModel } from '../models/Resource.js';
 import type { ChangeDTO, ChangeFilters, CreateChangeInput, ChangeStatus } from '../types/change.js';
 import type { PaginatedResult } from '../types/pagination.js';
 import { AppError } from '../utils/app-error.js';
-import { sanitizeObject } from '../utils/sensitive-data.js';
+import { sanitizeObject, sanitizeStructured } from '../utils/sensitive-data.js';
 
 async function assertResourceExists(resourceId: string): Promise<Types.ObjectId> {
   if (!mongoose.isValidObjectId(resourceId)) throw new AppError(400, 'resourceId must be a valid MongoDB ObjectId.');
@@ -29,8 +29,8 @@ export async function createChange(input: CreateChangeInput): Promise<ChangeDTO>
     resourceId,
     evidenceIds,
     timestamp: new Date(input.timestamp),
-    before: input.before ? sanitizeObject(input.before) : undefined,
-    after: input.after ? sanitizeObject(input.after) : undefined,
+    before: input.before !== undefined ? sanitizeStructured(input.before) : undefined,
+    after: input.after !== undefined ? sanitizeStructured(input.after) : undefined,
     metadata: sanitizeObject(input.metadata)
   });
   return toChangeDTO(change);
