@@ -11,6 +11,7 @@ import { changeRouter, resourceChangeRouter } from './routes/changeRoutes.js';
 import { evidenceRouter, resourceEvidenceRouter } from './routes/evidenceRoutes.js';
 import { dependencyRouter, resourceDependencyRouter } from './routes/dependencyRoutes.js';
 import { changeAnalysisRouter, changeRouterAnalysis } from './routes/changeAnalysisRoutes.js';
+import { comparisonRouter, observationRouter, predictionRealityRouter, predictionRouter } from './routes/predictionRealityRoutes.js';
 
 export const app = express();
 
@@ -21,10 +22,14 @@ app.use('/api/evidence', evidenceRouter);
 app.use('/api/changes', changeRouter);
 app.use('/api/dependencies', dependencyRouter);
 app.use('/api/change-analyses', changeAnalysisRouter);
+app.use('/api/predictions', predictionRouter);
+app.use('/api/observations', observationRouter);
+app.use('/api/comparisons', comparisonRouter);
 app.use('/api/resources/:resourceId/evidence', resourceEvidenceRouter);
 app.use('/api/resources/:resourceId/changes', resourceChangeRouter);
 app.use('/api/resources/:resourceId', resourceDependencyRouter);
 app.use('/api/changes/:changeId', changeRouterAnalysis);
+app.use('/api/changes/:changeId', predictionRealityRouter);
 app.use('/api/resources', resourceRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -1,0 +1,16 @@
+import type { RequestHandler } from 'express';
+import { createObservation, createPrediction, compareObservation, getComparison, getComparisonById, getObservationById, getObservations, getPrediction, getPredictionById } from '../services/predictionRealityService.js';
+import { parseQueryString, pathString, requiredString } from '../utils/request-validation.js';
+import { AppError } from '../utils/app-error.js';
+
+function bodyRecord(value: unknown): Record<string, unknown> { if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new AppError(400, 'Request body must be a JSON object.'); return value as Record<string, unknown>; }
+
+export const postPrediction: RequestHandler = async (request, response) => { const data = await createPrediction(pathString(request.params.changeId, 'changeId')); response.status(201).json({ success: true, data }); };
+export const postObservation: RequestHandler = async (request, response) => { const body = bodyRecord(request.body); const predictionId = requiredString(body.predictionId, 'predictionId', 24); const start = requiredString(body.start, 'start', 64); const end = requiredString(body.end, 'end', 64); const data = await createObservation(pathString(request.params.changeId, 'changeId'), predictionId, start, end); response.status(201).json({ success: true, data }); };
+export const postComparison: RequestHandler = async (request, response) => { const body = bodyRecord(request.body); const predictionId = requiredString(body.predictionId, 'predictionId', 24); const observationId = requiredString(body.observationId, 'observationId', 24); const data = await compareObservation(pathString(request.params.changeId, 'changeId'), predictionId, observationId); response.status(201).json({ success: true, data }); };
+export const readPrediction: RequestHandler = async (request, response) => { const data = await getPrediction(pathString(request.params.changeId, 'changeId')); response.status(200).json({ success: true, data }); };
+export const readObservations: RequestHandler = async (request, response) => { const data = await getObservations(pathString(request.params.changeId, 'changeId')); response.status(200).json({ success: true, data }); };
+export const readComparison: RequestHandler = async (request, response) => { const data = await getComparison(pathString(request.params.changeId, 'changeId')); response.status(200).json({ success: true, data }); };
+export const readPredictionById: RequestHandler = async (request, response) => { const data = await getPredictionById(pathString(request.params.id, 'predictionId')); response.status(200).json({ success: true, data }); };
+export const readObservationById: RequestHandler = async (request, response) => { const data = await getObservationById(pathString(request.params.id, 'observationId')); response.status(200).json({ success: true, data }); };
+export const readComparisonById: RequestHandler = async (request, response) => { const data = await getComparisonById(pathString(request.params.id, 'comparisonId')); response.status(200).json({ success: true, data }); };

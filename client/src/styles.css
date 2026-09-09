@@ -177,6 +177,22 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
 .risk-factor strong span { color: #f4b860; }
 .risk-factor small { display: block; margin-top: 5px; line-height: 1.4; }
 .analysis-timestamp { margin: 20px 0 0; }
+.reality-section { max-width: 1180px; margin: 0 auto; padding: 86px 32px 110px; border-top: 1px solid #29435a; }
+.reality-heading { margin-bottom: 34px; }
+.reality-heading h2 { font-size: clamp(2.2rem, 5vw, 4rem); }
+.reality-toolbar, .reality-actions { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 20px; padding: 16px; border: 1px solid #29435a; background: rgba(13, 28, 46, .62); }
+.reality-toolbar label, .reality-actions label { display: grid; gap: 7px; flex: 1; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
+.reality-toolbar select, .reality-actions input { min-width: 0; border: 1px solid #3a566d; border-radius: 2px; padding: 10px 11px; color: #e8eef5; background: #112237; font: inherit; font-size: .85rem; letter-spacing: 0; text-transform: none; }
+.reality-card { margin: 18px 0; padding: 22px; border: 1px solid #f4b860; background: #10243a; color: #c7d4e2; font-family: 'Segoe UI', sans-serif; }
+.reality-card--observed { border-color: #61c59c; }
+.reality-card--comparison { border-color: #8ea8d1; }
+.reality-card h3 { margin: 0 0 18px; color: #f4f7fb; font-family: Georgia, serif; font-size: 1.35rem; font-weight: 400; }
+.reality-card p { font-size: .82rem; line-height: 1.55; }
+.reality-stats { display: flex; flex-wrap: wrap; gap: 10px 24px; padding-bottom: 16px; border-bottom: 1px solid #29435a; }
+.reality-stats strong { color: #f4b860; font-size: 2rem; font-weight: 400; }
+.reality-stats strong small { font-size: .72rem; text-transform: uppercase; }
+.reality-stats span { align-self: center; color: #d5dfeb; font-size: .8rem; }
+.evidence-state { color: #9be2c1; font-weight: 700; letter-spacing: .08em; }
 
 @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -213,4 +229,8 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
   .analysis-toolbar .button { margin-top: 14px; }
   .change-context span { display: block; margin-top: 8px; }
   .analysis-summary, .analysis-grid { grid-template-columns: 1fr; }
+  .reality-section { padding: 66px 20px 80px; }
+  .reality-toolbar, .reality-actions { display: block; }
+  .reality-toolbar .button, .reality-actions .button { margin-top: 14px; }
+  .reality-actions label + label { margin-top: 14px; }
 }

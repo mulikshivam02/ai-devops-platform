@@ -16,6 +16,20 @@ This keeps development, testing and deployment simpler.
 
 Microservices can be considered later if there is a demonstrated need.
 
+## ADR-011 - Prediction Versus Reality Semantics
+
+Status: Accepted
+
+### Decision
+
+Phase 6 stores immutable prediction snapshots, derives bounded observations exclusively from relevant structured Evidence, and compares them deterministically. Missing evidence never becomes evidence of no impact; comparisons use unknown or insufficient-evidence semantics instead.
+
+Observation windows must be valid and no longer than seven days. Metric deltas are calculated as observed minus baseline, with a small deterministic noise threshold for unchanged values. Accuracy averages only dimensions with comparable data.
+
+### Reason
+
+ChangeLens must distinguish hypotheses from observed facts and avoid overstating system behavior before live collectors exist.
+
 ## ADR-010 - Deterministic Change Intelligence
 
 Status: Accepted

@@ -4,6 +4,7 @@ import type { Evidence, EvidenceFilters, EvidenceInput } from '../types/evidence
 import type { Change, ChangeFilters, ChangeInput, ChangeStatus } from '../types/change';
 import type { Dependency, DependencyFilters, DependencyGraph, DependencyInput } from '../types/dependency';
 import type { ChangeAnalysis } from '../types/changeAnalysis';
+import type { ObservedImpact, PredictionComparison, PredictionSnapshot } from '../types/predictionReality';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -170,3 +171,10 @@ export function listChangeAnalyses(filters: { changeId?: string; resourceId?: st
 export function getChangeAnalysisById(id: string): Promise<ChangeAnalysis> {
   return request<ChangeAnalysis>(`/change-analyses/${id}`);
 }
+
+export function createPrediction(changeId: string): Promise<PredictionSnapshot> { return request<PredictionSnapshot>(`/changes/${changeId}/prediction`, { method: 'POST' }); }
+export function getPrediction(changeId: string): Promise<PredictionSnapshot> { return request<PredictionSnapshot>(`/changes/${changeId}/prediction`); }
+export function createObservation(changeId: string, input: { predictionId: string; start: string; end: string }): Promise<ObservedImpact> { return request<ObservedImpact>(`/changes/${changeId}/observations`, { method: 'POST', body: JSON.stringify(input) }); }
+export function listObservations(changeId: string): Promise<ObservedImpact[]> { return request<ObservedImpact[]>(`/changes/${changeId}/observations`); }
+export function comparePrediction(changeId: string, input: { predictionId: string; observationId: string }): Promise<PredictionComparison> { return request<PredictionComparison>(`/changes/${changeId}/compare`, { method: 'POST', body: JSON.stringify(input) }); }
+export function getComparison(changeId: string): Promise<PredictionComparison> { return request<PredictionComparison>(`/changes/${changeId}/comparison`); }

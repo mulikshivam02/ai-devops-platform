@@ -93,9 +93,9 @@ Predict possible latency changes, error-rate changes, CPU changes, memory change
 
 ## Prediction vs Reality
 
-Status: Planned
+Status: Implemented
 
-Compare predicted impact with actual impact and detect unexpected deviations.
+Phase 6 snapshots Phase 5 predictions, derives observations only from relevant structured Evidence within a maximum seven-day window, and compares impact categories, resources, metrics, blast radius, severity, and accuracy. Missing evidence is reported as insufficient evidence rather than no impact. No external collectors or execution are included.
 
 ## Incident Intelligence
 
