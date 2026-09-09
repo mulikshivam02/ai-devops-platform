@@ -9,6 +9,8 @@ import { calculateChangeRisk } from '../engines/riskEngine.js';
 import type { ChangeAnalysisDTO, ImpactCategory } from '../types/changeAnalysis.js';
 import type { PaginatedResult } from '../types/pagination.js';
 import { AppError } from '../utils/app-error.js';
+import { SecurityFindingModel } from '../models/SecurityFinding.js';
+import { calculateSecurityRiskContribution } from '../engines/securityRiskEngine.js';
 
 const MAX_DEPTH = 10;
 const ANALYSIS_VERSION = '1.0';
@@ -65,7 +67,9 @@ export async function analyzeChange(changeId: string): Promise<ChangeAnalysisDTO
   const transitive = [...new Set(allEdges.flatMap((edge) => [edge.sourceResourceId, edge.targetResourceId]).filter((id) => !directlyAffected.some((direct) => direct.toString() === id)))].map((id) => new Types.ObjectId(id));
   const maxDependencyDepth = calculateMaxDepth(changeDTO.resourceId, allEdges);
   const rollback = rollbackFor(changeDTO);
-  const risk = calculateChangeRisk({ changeType: changeDTO.changeType, environment: resource.environment, changedItemCount: changedItems.length, transitiveCount: transitive.length, maxDependencyDepth, rollbackAvailable: rollback.available });
+  const securityFindings = await SecurityFindingModel.find({ changeId: changeObjectId }).select({ severity: 1, fingerprint: 1 }).limit(1000).lean();
+  const securityContribution = calculateSecurityRiskContribution(securityFindings.map((finding) => ({ severity: finding.severity, fingerprint: finding.fingerprint })));
+  const risk = calculateChangeRisk({ changeType: changeDTO.changeType, environment: resource.environment, changedItemCount: changedItems.length, transitiveCount: transitive.length, maxDependencyDepth, rollbackAvailable: rollback.available, securityContribution });
   const impact = impactFor(changeDTO.changeType, transitive.length);
   const data = { changeId: changeObjectId, resourceId, analyzedAt: new Date(), changedItems, directlyAffectedResourceIds: directlyAffected, transitivelyAffectedResourceIds: transitive, blastRadius: { directCount: Math.max(0, directlyAffected.length - 1), transitiveCount: transitive.length, totalCount: directlyAffected.length + transitive.length, maxDependencyDepth }, risk, impact, rollback, evidenceIds, analysisVersion: ANALYSIS_VERSION, metadata: {} };
   const analysis = await ChangeAnalysisModel.findOneAndUpdate({ changeId: changeObjectId }, data, { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true });

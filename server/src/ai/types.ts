@@ -11,6 +11,7 @@ export interface InvestigationContext {
   observation?: unknown;
   comparison?: unknown;
   history: Array<{ id: string; summary: string; changeType: string; timestamp: string; status: string }>;
+  securityFindings: Array<{ id: string; category: string; severity: string; title: string; description: string; resourceId?: string; changeId?: string; evidenceIds: string[]; confidence: number; cve?: string; cwe?: string; dependencyBlastRadius: { directDependents: string[]; transitiveDependents: string[]; dependencyDepth: number; totalPotentiallyAffected: number; semantics: 'potentially_affected_by_dependency_relationship' } }>;
 }
 
 export interface AIAnalysisInput { type: ReasoningType; context: InvestigationContext; prompt: string; }

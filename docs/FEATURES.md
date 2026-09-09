@@ -117,11 +117,15 @@ Use history to improve future analysis.
 
 ## Security Intelligence
 
-Status: Planned
+Status: Implemented
 
-Analyze dependencies, secrets, Docker, Terraform, Kubernetes, CI/CD and repositories.
+Phase 8 stores structured, evidence-backed security findings with validated Change, Resource, and Evidence references. Findings support dependency, container, Terraform, Kubernetes, CI/CD, configuration, code, secret-exposure, and misconfiguration categories without running scanners or external commands.
 
-Security results should influence change risk.
+Security findings are normalized deterministically, deduplicated by a stable fingerprint, filtered and paginated through the API, summarized by severity/category, and added to Change risk through a capped deterministic contribution. Dependency traversal is bounded to the existing depth-10 graph semantics: security findings belong to the evidenced resource; dependent resources are only potentially affected by the relationship and are not claimed to be vulnerable.
+
+Security findings are carried through Prediction vs Reality as predicted fingerprints, observed evidence-backed findings, and deterministic `confirmed`, `unexpected`, or `insufficient_evidence` outcomes. Missing security evidence never means that no vulnerability exists.
+
+AI investigation context includes only bounded finding fields, evidence IDs, confidence, optional CVE/CWE values, and potential dependency blast-radius facts. Secret findings store only redacted metadata and evidence references. AI remains an optional explanation layer and cannot alter finding fields, evidence, affected resources, or risk scores. The frontend distinguishes SECURITY FINDING from POTENTIAL BLAST RADIUS and states: "Potentially affected by dependency relationship." Automatic remediation, scanner execution, cloud/API integrations, and secret rotation remain out of scope for Phase 8.
 
 ## Remediation
 

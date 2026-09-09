@@ -1,0 +1,5 @@
+export const securitySeverities = ['critical', 'high', 'medium', 'low', 'info', 'unknown'] as const;
+export type SecuritySeverity = (typeof securitySeverities)[number];
+export interface SecurityFinding { id: string; resourceId?: string; changeId?: string; evidenceIds: string[]; source: string; category: string; severity: SecuritySeverity; title: string; description: string; cve?: string; cwe?: string; package?: string; installedVersion?: string; fixedVersion?: string; status: string; confidence: number; detectedAt: string; }
+export interface SecurityDependencyEdge { id: string; sourceResourceId: string; targetResourceId: string; relationshipType: string; }
+export interface SecuritySummary { total: number; critical: number; high: number; medium: number; low: number; info: number; open: number; affectedResources: number; categories: Record<string, number>; highestSeverity: SecuritySeverity; riskContribution: number; }

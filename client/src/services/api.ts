@@ -6,6 +6,7 @@ import type { Dependency, DependencyFilters, DependencyGraph, DependencyInput } 
 import type { ChangeAnalysis } from '../types/changeAnalysis';
 import type { ObservedImpact, PredictionComparison, PredictionSnapshot } from '../types/predictionReality';
 import type { Investigation } from '../types/investigation';
+import type { SecurityFinding, SecuritySummary, SecurityDependencyEdge } from '../types/security';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -183,3 +184,6 @@ export function investigateChange(changeId: string): Promise<Investigation> { re
 export function listInvestigations(changeId: string): Promise<Investigation[]> { return request<Investigation[]>(`/changes/${changeId}/investigations`); }
 export function getInvestigation(id: string): Promise<Investigation> { return request<Investigation>(`/investigations/${id}`); }
 export function getAIHealth(): Promise<{ available: boolean; provider: string; model: string; message: string }> { return request('/ai/health'); }
+export function listSecurityFindings(filters: { severity?: string; category?: string; status?: string; source?: string; page?: number; limit?: number } = {}): Promise<{ data: SecurityFinding[]; pagination: Pagination }> { return requestPage<SecurityFinding[]>(`/security/findings${queryString(filters)}`); }
+export function getSecuritySummary(): Promise<SecuritySummary> { return request<SecuritySummary>('/security/summary'); }
+export function getSecurityFindingDependents(resourceId: string, depth = 10): Promise<SecurityDependencyEdge[]> { return request<SecurityDependencyEdge[]>(`/resources/${resourceId}/dependents?depth=${depth}`); }

@@ -67,6 +67,9 @@ High-Level Architecture
                   Incident Intelligence
                           │
                           ▼
+                   Security Intelligence
+                       │
+                       ▼
                     Recommendation
                           │
                           ▼

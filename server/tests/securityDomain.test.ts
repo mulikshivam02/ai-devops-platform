@@ -1,0 +1,13 @@
+import { describe, expect, it } from 'vitest';
+import { SecurityFindingModel } from '../src/models/SecurityFinding.js';
+import { normalizeSecurityEvidence, normalizeSecurityFinding, fingerprintFor } from '../src/services/securityNormalizer.js';
+import { calculateChangeRisk } from '../src/engines/riskEngine.js';
+import { sanitizeObject } from '../src/utils/sensitive-data.js';
+
+describe('security domain validation and normalization', () => {
+  it('normalizes structured findings without inventing optional facts', () => { const result = normalizeSecurityFinding({ title: 'Unsafe policy', description: 'Structured evidence', severity: 'HIGH', category: 'iac', source: 'terraform' }); expect(result).toMatchObject({ title: 'Unsafe policy', severity: 'high', category: 'iac', source: 'terraform' }); expect(result?.cve).toBeUndefined(); expect(result?.fixedVersion).toBeUndefined(); });
+  it('rejects incomplete findings and supports finding arrays', () => { expect(normalizeSecurityFinding({ title: 'Missing description' })).toBeNull(); expect(normalizeSecurityEvidence({ findings: [{ title: 'A', description: 'B' }, { title: 'C', description: 'D' }] }, {})).toHaveLength(2); });
+  it('validates model enums and required fields without MongoDB', () => { const valid = new SecurityFindingModel({ source: 'manual', category: 'unknown', severity: 'unknown', title: 'Finding', description: 'Description', confidence: 60, remediation: { available: false }, fingerprint: 'fingerprint', detectedAt: new Date(), evidenceIds: [] }); expect(valid.validateSync()).toBeUndefined(); const invalid = new SecurityFindingModel({ ...valid.toObject(), severity: 'not-a-severity' }); expect(invalid.validateSync()?.errors.severity).toBeDefined(); });
+  it('redacts secret metadata and keeps duplicate fingerprints stable', () => { const input = normalizeSecurityFinding({ title: 'Secret exposure', description: 'Key detected', category: 'secret_exposure', metadata: { token: 'never-store', location: 'config.yaml' } })!; expect(sanitizeObject(input.metadata)).toEqual({ location: 'config.yaml' }); expect(fingerprintFor(input)).toBe(fingerprintFor({ ...input })); });
+  it('preserves the existing Phase 5 score when no security contribution exists', () => { const result = calculateChangeRisk({ changeType: 'code', environment: 'development', changedItemCount: 1, transitiveCount: 0, maxDependencyDepth: 0, rollbackAvailable: true }); expect(result.score).toBe(6); expect(result.factors.some((factor) => factor.name === 'security')).toBe(false); });
+});

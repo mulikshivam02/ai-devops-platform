@@ -8,6 +8,7 @@ export interface RiskInput {
   transitiveCount: number;
   maxDependencyDepth: number;
   rollbackAvailable: boolean;
+  securityContribution?: number;
 }
 
 export interface RiskResult {
@@ -32,6 +33,8 @@ export function calculateChangeRisk(input: RiskInput): RiskResult {
   factors.push({ name: 'change_type', contribution: type, reason: `${input.changeType} changes use the deterministic type weight.` });
   const rollback = input.rollbackAvailable ? -5 : 5;
   factors.push({ name: 'rollback', contribution: rollback, reason: input.rollbackAvailable ? 'A reliable before/previous value is available for rollback.' : 'No reliable rollback information is present.' });
+  const security = Math.max(0, Math.min(40, input.securityContribution ?? 0));
+  if (security > 0) factors.push({ name: 'security', contribution: security, reason: 'Unique evidence-backed security findings contribute a capped deterministic risk factor.' });
   const score = Math.max(0, Math.min(100, factors.reduce((sum, factor) => sum + factor.contribution, 0)));
   const level: RiskLevel = score >= 75 ? 'critical' : score >= 50 ? 'high' : score >= 25 ? 'medium' : 'low';
   return { score, level, factors };

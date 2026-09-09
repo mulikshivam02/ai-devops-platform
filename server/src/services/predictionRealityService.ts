@@ -10,6 +10,8 @@ import { comparePredictionReality } from '../engines/comparisonEngine.js';
 import type { PredictionSnapshotDTO, ObservedImpactDTO, PredictionComparisonDTO, MetricObservation, MetricDirection, ObservedSeverity } from '../types/predictionReality.js';
 import { AppError } from '../utils/app-error.js';
 import { sanitizeObject } from '../utils/sensitive-data.js';
+import { SecurityFindingModel } from '../models/SecurityFinding.js';
+import { compareSecurityImpact } from '../engines/securityComparisonEngine.js';
 
 const MAX_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 function objectId(id: string, field: string): Types.ObjectId { if (!mongoose.isValidObjectId(id)) throw new AppError(400, `${field} must be a valid MongoDB ObjectId.`); return new Types.ObjectId(id); }
@@ -23,7 +25,9 @@ export async function createPrediction(changeId: string): Promise<PredictionSnap
   const change = await ChangeModel.findById(changeObjectId); if (!change) throw new AppError(404, 'Change not found.');
   const analysis = await ChangeAnalysisModel.findOne({ changeId: changeObjectId }).sort({ analyzedAt: -1 }); if (!analysis) throw new AppError(404, 'Change analysis not found. Analyze the Change before creating a prediction.');
   const analysisDTO = toChangeAnalysisDTO(analysis); const resourceId = objectId(analysisDTO.resourceId, 'resourceId'); if (!(await mongoose.model('Resource').exists({ _id: resourceId }))) throw new AppError(404, 'Resource not found.');
-  const snapshot = await PredictionSnapshotModel.create({ changeId: changeObjectId, analysisId: analysis._id, resourceId, predictedAt: new Date(), predictedRisk: analysisDTO.risk, predictedImpact: analysisDTO.impact, predictedBlastRadius: analysisDTO.blastRadius, predictedResourceIds: [...new Set([...analysisDTO.directlyAffectedResourceIds, ...analysisDTO.transitivelyAffectedResourceIds])].map((id) => new Types.ObjectId(id)), predictionVersion: analysisDTO.analysisVersion, metadata: {} });
+  const securityFindings = await SecurityFindingModel.find({ changeId: changeObjectId }).limit(100).select({ _id: 1, fingerprint: 1, category: 1, severity: 1, title: 1, evidenceIds: 1 }).lean();
+  const predictedSecurityFindings = securityFindings.map((finding) => ({ fingerprint: finding.fingerprint, findingId: finding._id.toString(), category: finding.category, severity: finding.severity, title: finding.title, evidenceIds: finding.evidenceIds }));
+  const snapshot = await PredictionSnapshotModel.create({ changeId: changeObjectId, analysisId: analysis._id, resourceId, predictedAt: new Date(), predictedRisk: analysisDTO.risk, predictedImpact: analysisDTO.impact, predictedBlastRadius: analysisDTO.blastRadius, predictedResourceIds: [...new Set([...analysisDTO.directlyAffectedResourceIds, ...analysisDTO.transitivelyAffectedResourceIds])].map((id) => new Types.ObjectId(id)), predictedSecurityFindings, predictionVersion: analysisDTO.analysisVersion, metadata: {} });
   return toPredictionSnapshotDTO(snapshot);
 }
 
@@ -40,14 +44,16 @@ export async function createObservation(changeId: string, predictionId: string, 
     if (typeof payload.eventName === 'string') events.push({ name: payload.eventName, status: typeof payload.status === 'string' ? payload.status : undefined, source: item.source });
     if (typeof payload.failureName === 'string') { const severity = payload.severity; const valid = severity === 'critical' || severity === 'high' || severity === 'medium' || severity === 'low'; failures.push({ name: payload.failureName, severity: valid ? severity : 'unknown', source: item.source }); }
   }
+  const observationEvidenceIds = evidence.map((item) => item._id); const securityFindings = await SecurityFindingModel.find({ evidenceIds: { $in: observationEvidenceIds } }).limit(100).select({ _id: 1, fingerprint: 1, category: 1, severity: 1, title: 1, evidenceIds: 1 }).lean();
+  const observedSecurityFindings = securityFindings.map((finding) => ({ fingerprint: finding.fingerprint, findingId: finding._id.toString(), category: finding.category, severity: finding.severity, title: finding.title, evidenceIds: finding.evidenceIds }));
   const status = evidence.length === 0 ? 'insufficient_evidence' : 'observed'; const summary = evidence.length === 0 ? 'Insufficient evidence to determine observed impact in the requested window.' : `Observed ${evidence.length} relevant evidence record(s); unsupported dimensions remain unconfirmed.`;
-  const doc = await ObservedImpactModel.create({ changeId: changeObjectId, predictionId: objectId(predictionId, 'predictionId'), resourceId: objectId(prediction.resourceId, 'resourceId'), observationWindow: dates, evidenceIds: evidence.map((item) => item._id), observedImpact: { categories: [...categories].slice(0, 30), summary }, observedResources: [...observedResources].slice(0, 100).map((id) => objectId(id, 'observedResourceId')), observedMetrics: metrics.slice(0, 50), observedEvents: events.slice(0, 50), observedFailures: failures.slice(0, 50), status });
+  const doc = await ObservedImpactModel.create({ changeId: changeObjectId, predictionId: objectId(predictionId, 'predictionId'), resourceId: objectId(prediction.resourceId, 'resourceId'), observationWindow: dates, evidenceIds: observationEvidenceIds, observedImpact: { categories: [...categories].slice(0, 30), summary }, observedResources: [...observedResources].slice(0, 100).map((id) => objectId(id, 'observedResourceId')), observedMetrics: metrics.slice(0, 50), observedEvents: events.slice(0, 50), observedFailures: failures.slice(0, 50), observedSecurityFindings, status });
   return toObservedImpactDTO(doc);
 }
 
 export async function compareObservation(changeId: string, predictionId: string, observationId: string): Promise<PredictionComparisonDTO> {
   const prediction = await predictionFor(changeId, predictionId); const observation = await ObservedImpactModel.findById(objectId(observationId, 'observationId')); if (!observation) throw new AppError(404, 'Observation not found.'); if (observation.changeId.toString() !== changeId || observation.predictionId.toString() !== predictionId) throw new AppError(400, 'Observation does not belong to the requested Change and Prediction.');
-  const result = comparePredictionReality(prediction, toObservedImpactDTO(observation)); const doc = await PredictionComparisonModel.create({ ...result, changeId: objectId(changeId, 'changeId'), predictionId: objectId(predictionId, 'predictionId'), observationId: objectId(observationId, 'observationId'), comparedAt: new Date(result.comparedAt), evidenceIds: result.evidenceIds.map((id) => objectId(id, 'evidenceId')) }); return toPredictionComparisonDTO(doc);
+  const observationDTO = toObservedImpactDTO(observation); const result = comparePredictionReality(prediction, observationDTO); const doc = await PredictionComparisonModel.create({ ...result, changeId: objectId(changeId, 'changeId'), predictionId: objectId(predictionId, 'predictionId'), observationId: objectId(observationId, 'observationId'), comparedAt: new Date(result.comparedAt), evidenceIds: result.evidenceIds.map((id) => objectId(id, 'evidenceId')) }); return toPredictionComparisonDTO(doc);
 }
 
 export async function getPrediction(changeId: string): Promise<PredictionSnapshotDTO> { const changeObjectId = objectId(changeId, 'changeId'); const doc = await PredictionSnapshotModel.findOne({ changeId: changeObjectId }).sort({ predictedAt: -1 }); if (!doc) throw new AppError(404, 'Prediction not found.'); return toPredictionSnapshotDTO(doc); }

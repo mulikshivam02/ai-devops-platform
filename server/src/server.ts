@@ -13,6 +13,7 @@ import { dependencyRouter, resourceDependencyRouter } from './routes/dependencyR
 import { changeAnalysisRouter, changeRouterAnalysis } from './routes/changeAnalysisRoutes.js';
 import { comparisonRouter, observationRouter, predictionRealityRouter, predictionRouter } from './routes/predictionRealityRoutes.js';
 import { aiHealthRouter, investigationByIdRouter, investigationRouter } from './routes/investigationRoutes.js';
+import { securityRouter, changeSecurityRouter, resourceSecurityRouter } from './routes/securityRoutes.js';
 
 export const app = express();
 
@@ -27,11 +28,14 @@ app.use('/api/predictions', predictionRouter);
 app.use('/api/observations', observationRouter);
 app.use('/api/comparisons', comparisonRouter);
 app.use('/api/ai/health', aiHealthRouter);
+app.use('/api/security', securityRouter);
 app.use('/api/investigations', investigationByIdRouter);
 app.use('/api/resources/:resourceId/evidence', resourceEvidenceRouter);
+app.use('/api/resources/:resourceId', resourceSecurityRouter);
 app.use('/api/resources/:resourceId/changes', resourceChangeRouter);
 app.use('/api/resources/:resourceId', resourceDependencyRouter);
 app.use('/api/changes/:changeId', changeRouterAnalysis);
+app.use('/api/changes/:changeId', changeSecurityRouter);
 app.use('/api/changes/:changeId', predictionRealityRouter);
 app.use('/api/changes/:changeId', investigationRouter);
 app.use('/api/resources', resourceRouter);

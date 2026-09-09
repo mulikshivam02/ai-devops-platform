@@ -156,6 +156,20 @@ The remediation workflow is:
 
 Recommend -> Validate -> Approve -> Execute -> Verify
 
+## ADR-013 - Evidence-First Security Findings
+
+Status: Accepted
+
+### Decision
+
+Phase 8 represents security observations as normalized `SecurityFinding` records. Findings reference existing Evidence, Change, and Resource records rather than duplicating payloads. Missing source fields remain `unknown` or omitted; the platform never invents a CVE, severity, version, location, or remediation version.
+
+Duplicate findings use a stable fingerprint and a unique database index. Security severity weights are deterministic, deduplicated, and capped before being added to the existing 0-100 Change risk calculation. Dependency traversal uses the existing bounded graph and describes downstream resources as potentially affected, not vulnerable.
+
+### Reason
+
+Security analysis must remain reproducible and passive before real scanners and controlled remediation are introduced. AI may explain verified findings but cannot create or modify security facts.
+
 ## ADR-006 - Repository Name
 
 Status: Accepted
