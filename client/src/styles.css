@@ -134,6 +134,24 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
 .detail-placeholder { display: grid; min-height: 180px; place-items: center; padding: 24px; border: 1px dashed #3a566d; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .85rem; text-align: center; }
 .pagination-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 24px; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .75rem; }
 
+.graph-section { max-width: 1180px; margin: 0 auto; padding: 86px 32px 110px; border-top: 1px solid #29435a; animation: rise-in .7s .2s ease both; }
+.graph-heading { margin-bottom: 34px; }
+.graph-heading h2 { font-size: clamp(2.2rem, 5vw, 4rem); }
+.graph-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; margin-bottom: 24px; padding: 16px; border: 1px solid #29435a; background: rgba(13, 28, 46, .62); }
+.graph-toolbar label { display: grid; gap: 7px; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
+.graph-toolbar select, .graph-toolbar input { min-width: 150px; border: 1px solid #3a566d; border-radius: 2px; padding: 10px 11px; color: #e8eef5; background: #112237; font: inherit; font-size: .85rem; letter-spacing: 0; text-transform: none; }
+.graph-content { display: grid; grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr); gap: 16px; }
+.graph-nodes, .graph-edges { min-width: 0; padding: 22px; border: 1px solid #29435a; background: rgba(13, 28, 46, .72); }
+.graph-content h3 { margin: 0 0 16px; color: #f4f7fb; font-size: 1.15rem; font-weight: 400; }
+.graph-node { margin-top: 8px; padding: 13px; border-left: 2px solid #3a566d; background: #10243a; }
+.graph-node--root { border-left-color: #f4b860; }
+.graph-node strong, .graph-node small { display: block; }
+.graph-node strong { color: #f4f7fb; font-family: Georgia, serif; font-weight: 400; }
+.graph-node small { margin-top: 5px; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .7rem; }
+.graph-edge { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 8px; padding: 13px; border: 1px solid #29435a; color: #c7d4e2; font-family: 'Segoe UI', sans-serif; font-size: .78rem; }
+.graph-edge span { overflow-wrap: anywhere; }
+.graph-edge strong { color: #f4b860; font-size: .7rem; font-weight: 700; text-align: center; white-space: nowrap; }
+
 @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 700px) {
@@ -158,4 +176,10 @@ h2 { margin: 0; color: #f4f7fb; font-size: 1.55rem; font-weight: 400; }
   .record-layout { grid-template-columns: 1fr; }
   .detail-meta { grid-template-columns: 1fr; }
   .pagination-controls { flex-wrap: wrap; }
+  .graph-section { padding: 66px 20px 80px; }
+  .graph-content { grid-template-columns: 1fr; }
+  .graph-toolbar { display: grid; grid-template-columns: 1fr 1fr; }
+  .graph-toolbar label:first-child { grid-column: 1 / -1; }
+  .graph-edge { grid-template-columns: 1fr; gap: 6px; }
+  .graph-edge strong { text-align: left; }
 }

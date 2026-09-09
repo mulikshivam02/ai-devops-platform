@@ -46,7 +46,9 @@ Phase 3 records manually supplied change history with deterministic classificati
 
 ## Dependency Graph
 
-Status: Planned
+Status: Implemented
+
+Phase 4 provides explicit, deterministic dependency relationships with evidence references, direct and multi-hop traversal, cycle-safe graph responses, and a basic frontend graph view. Risk, blast-radius scoring, prediction, and live collectors remain future work.
 
 Build relationships between services, deployments, pods, containers, databases, infrastructure and Git changes.
 

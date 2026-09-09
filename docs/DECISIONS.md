@@ -16,6 +16,18 @@ This keeps development, testing and deployment simpler.
 
 Microservices can be considered later if there is a demonstrated need.
 
+## ADR-009 - Explicit Dependency Graph Direction
+
+Status: Accepted
+
+### Decision
+
+Dependency edges use `sourceResourceId -> targetResourceId`. For `depends_on`, A -> B means A depends on B. Dependency traversal follows outgoing edges; dependent traversal follows incoming edges. Graph traversal is bounded to a maximum depth of 10 and uses visited-resource tracking for cycles.
+
+### Reason
+
+Explicit direction makes graph behavior deterministic and prevents ambiguous impact traversal. Relationships are manually or evidence supplied; no AI or automatic inference creates graph edges.
+
 ## ADR-008 - Evidence and Change History Foundations
 
 Status: Accepted

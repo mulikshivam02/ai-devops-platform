@@ -9,6 +9,7 @@ import { healthRouter } from './routes/health.routes.js';
 import { resourceRouter } from './routes/resourceRoutes.js';
 import { changeRouter, resourceChangeRouter } from './routes/changeRoutes.js';
 import { evidenceRouter, resourceEvidenceRouter } from './routes/evidenceRoutes.js';
+import { dependencyRouter, resourceDependencyRouter } from './routes/dependencyRoutes.js';
 
 export const app = express();
 
@@ -17,8 +18,10 @@ app.use(express.json());
 app.use('/api/health', healthRouter);
 app.use('/api/evidence', evidenceRouter);
 app.use('/api/changes', changeRouter);
+app.use('/api/dependencies', dependencyRouter);
 app.use('/api/resources/:resourceId/evidence', resourceEvidenceRouter);
 app.use('/api/resources/:resourceId/changes', resourceChangeRouter);
+app.use('/api/resources/:resourceId', resourceDependencyRouter);
 app.use('/api/resources', resourceRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);

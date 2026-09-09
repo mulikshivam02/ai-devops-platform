@@ -2,6 +2,7 @@ import type { HealthStatus } from '../types/health';
 import type { Resource, ResourceFilters, ResourceInput } from '../types/resource';
 import type { Evidence, EvidenceFilters, EvidenceInput } from '../types/evidence';
 import type { Change, ChangeFilters, ChangeInput, ChangeStatus } from '../types/change';
+import type { Dependency, DependencyFilters, DependencyGraph, DependencyInput } from '../types/dependency';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
 
@@ -119,4 +120,36 @@ export function createChange(input: ChangeInput): Promise<Change> {
 
 export function updateChangeStatus(id: string, status: ChangeStatus): Promise<Change> {
   return request<Change>(`/changes/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+}
+
+export function listDependencies(filters: DependencyFilters = {}): Promise<{ data: Dependency[]; pagination: Pagination }> {
+  return requestPage<Dependency[]>(`/dependencies${queryString(filters)}`);
+}
+
+export function getDependency(id: string): Promise<Dependency> {
+  return request<Dependency>(`/dependencies/${id}`);
+}
+
+export function createDependency(input: DependencyInput): Promise<Dependency> {
+  return request<Dependency>('/dependencies', { method: 'POST', body: JSON.stringify(input) });
+}
+
+export function updateDependency(id: string, input: Partial<DependencyInput>): Promise<Dependency> {
+  return request<Dependency>(`/dependencies/${id}`, { method: 'PATCH', body: JSON.stringify(input) });
+}
+
+export function deleteDependency(id: string): Promise<null> {
+  return request<null>(`/dependencies/${id}`, { method: 'DELETE' });
+}
+
+export function getResourceDependencies(resourceId: string, depth = 1): Promise<Dependency[]> {
+  return request<Dependency[]>(`/resources/${resourceId}/dependencies?depth=${depth}`);
+}
+
+export function getResourceDependents(resourceId: string, depth = 1): Promise<Dependency[]> {
+  return request<Dependency[]>(`/resources/${resourceId}/dependents?depth=${depth}`);
+}
+
+export function getResourceGraph(resourceId: string, depth = 1, direction: 'dependencies' | 'dependents' = 'dependencies'): Promise<DependencyGraph> {
+  return request<DependencyGraph>(`/resources/${resourceId}/dependency-graph?depth=${depth}&direction=${direction}`);
 }
