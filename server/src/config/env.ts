@@ -31,7 +31,7 @@ const jwtSecret = process.env.JWT_SECRET ?? (nodeEnvironment === 'production' ? 
 if (nodeEnvironment === 'production' && jwtSecret.length < 32) throw new Error('JWT_SECRET must be at least 32 characters in production.');
 const jsonBodyLimit = process.env.JSON_BODY_LIMIT ?? '1mb';
 
-const ollamaTimeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS ?? 60000);
+const ollamaTimeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS ?? 120000);
 
 if (!Number.isInteger(ollamaTimeoutMs) || ollamaTimeoutMs <= 0) {
   throw new Error('OLLAMA_TIMEOUT_MS must be a positive integer.');

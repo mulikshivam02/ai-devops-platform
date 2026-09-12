@@ -51,6 +51,11 @@
 - Keep the provider replaceable.
 - Prefer structured AI responses.
 - AI recommendations must be distinguishable from verified facts.
+- The Ollama provider is optional and configured through OLLAMA_BASE_URL, OLLAMA_MODEL, OLLAMA_TIMEOUT_MS and AI_PROVIDER.
+- AI output must be parsed as structured JSON, stripped only of safe wrapper text such as a single `<think>` block or markdown fence around the JSON payload, and then validated before persistence.
+- Evidence IDs are strict allowlists and validation rejects any unknown or duplicated IDs.
+- Investigations never execute shell commands, production actions, or destructive actions; recommendations remain advisory and require human approval.
+- Mock provider output is the default test path when the AI provider is intentionally disabled in CI.
 
 ## Security
 

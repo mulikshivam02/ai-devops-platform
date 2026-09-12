@@ -12,6 +12,17 @@ body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradie
 
 body::before { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 48px 48px; content: ''; mask-image: linear-gradient(to bottom, black, transparent 75%); }
 
+.auth-shell { display: grid; min-height: 100vh; place-items: center; padding: 32px 20px; }
+.auth-panel { width: min(100%, 460px); padding: 32px; border: 1px solid #29435a; background: rgba(13, 28, 46, .88); box-shadow: 0 24px 70px rgba(0, 0, 0, .2); }
+.auth-panel h1 { font-size: clamp(2.6rem, 8vw, 4.6rem); }
+.auth-copy { margin: 22px 0 0; color: #aebdcd; font-family: 'Segoe UI', sans-serif; line-height: 1.6; }
+.auth-form { display: grid; gap: 16px; margin-top: 30px; }
+.auth-form label { display: grid; gap: 7px; color: #8294a9; font-family: 'Segoe UI', sans-serif; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
+.auth-form input { width: 100%; border: 1px solid #3a566d; border-radius: 2px; padding: 11px; color: #e8eef5; background: #112237; font: inherit; font-size: .9rem; letter-spacing: 0; }
+.auth-form input:focus { outline: 2px solid #f4b860; outline-offset: 1px; }
+.auth-submit { margin-top: 4px; }
+.auth-loading { display: grid; min-height: 100vh; place-items: center; color: #aebdcd; font-family: 'Segoe UI', sans-serif; }
+
 .topbar { display: flex; align-items: center; justify-content: space-between; max-width: 1180px; margin: 0 auto; padding: 28px 32px; font-family: 'Segoe UI', sans-serif; }
 
 .brand { display: inline-flex; align-items: center; gap: 10px; color: #f4f7fb; font-size: 1.1rem; font-weight: 600; letter-spacing: .01em; text-decoration: none; }
@@ -22,6 +33,7 @@ body::before { position: fixed; inset: 0; z-index: -1; background-image: linear-
 
 .topbar-nav { display: flex; align-items: center; gap: 24px; }
 .topbar-nav a { color: #f4b860; font-family: 'Segoe UI', sans-serif; font-size: .8rem; text-decoration: none; }
+.topbar-logout { font-family: 'Segoe UI', sans-serif; font-size: .8rem; }
 
 .page-shell { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: clamp(40px, 8vw, 128px); align-items: center; max-width: 1180px; min-height: calc(100vh - 92px); margin: 0 auto; padding: 40px 32px 100px; }
 

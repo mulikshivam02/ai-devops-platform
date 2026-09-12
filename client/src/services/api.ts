@@ -11,6 +11,7 @@ import type { Remediation } from '../types/remediation';
 import type { AdvancedInsight, IntelligenceOverview } from '../types/intelligence';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api';
+export const authSessionChanged = 'changelens-auth-session-changed';
 
 export async function fetchHealth(): Promise<HealthStatus> {
   const response = await fetch(`${apiBaseUrl}/health`);
@@ -29,7 +30,7 @@ interface ApiResponse<T> {
 }
 
 export interface AuthUser { id: string; email: string; role: 'viewer' | 'operator' | 'admin'; active: boolean; createdAt: string; }
-export function setAuthToken(token: string | null): void { if (token) localStorage.setItem('changelens_token', token); else localStorage.removeItem('changelens_token'); }
+export function setAuthToken(token: string | null): void { if (token) localStorage.setItem('changelens_token', token); else localStorage.removeItem('changelens_token'); window.dispatchEvent(new Event(authSessionChanged)); }
 function authHeaders(): HeadersInit { const token = localStorage.getItem('changelens_token'); return token ? { Authorization: `Bearer ${token}` } : {}; }
 
 export interface Pagination {
@@ -56,7 +57,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 async function requestPage<T>(path: string): Promise<{ data: T; pagination: Pagination }> {
   const response = await fetch(`${apiBaseUrl}${path}`, { headers: authHeaders() });
   const body = (await response.json().catch(() => null)) as ApiResponse<T> | { error?: string | { message?: string } } | null;
-  if (!response.ok) { const error = body && 'error' in body ? body.error : undefined; const message = typeof error === 'string' ? error : error && typeof error === 'object' && 'message' in error ? String(error.message) : `Request failed with status ${response.status}.`; throw new Error(message); }
+  if (!response.ok) { const error = body && 'error' in body ? body.error : undefined; const message = typeof error === 'string' ? error : error && typeof error === 'object' && 'message' in error ? String(error.message) : `Request failed with status ${response.status}.`; if (response.status === 401) setAuthToken(null); throw new Error(message); }
   if (!body || !('pagination' in body) || !body.pagination) throw new Error('The API returned invalid pagination data.');
   return { data: body.data, pagination: body.pagination };
 }
@@ -193,7 +194,7 @@ export function listInvestigations(changeId: string): Promise<Investigation[]> {
 export function getInvestigation(id: string): Promise<Investigation> { return request<Investigation>(`/investigations/${id}`); }
 export function getAIHealth(): Promise<{ available: boolean; provider: string; model: string; message: string }> { return request('/ai/health'); }
 export async function login(email: string, password: string): Promise<AuthUser> { const result = await request<{ user: AuthUser; token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }); setAuthToken(result.token); return result.user; }
-export function logout(): Promise<null> { setAuthToken(null); return request<null>('/auth/logout', { method: 'POST' }); }
+export async function logout(): Promise<null> { try { return await request<null>('/auth/logout', { method: 'POST' }); } finally { setAuthToken(null); } }
 export function currentUser(): Promise<AuthUser> { return request<AuthUser>('/auth/me'); }
 export function listSecurityFindings(filters: { severity?: string; category?: string; status?: string; source?: string; page?: number; limit?: number } = {}): Promise<{ data: SecurityFinding[]; pagination: Pagination }> { return requestPage<SecurityFinding[]>(`/security/findings${queryString(filters)}`); }
 export function getSecuritySummary(): Promise<SecuritySummary> { return request<SecuritySummary>('/security/summary'); }

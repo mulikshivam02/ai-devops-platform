@@ -194,6 +194,20 @@ Phase 10 derives historical outcomes, similarity, trends, prediction accuracy, b
 
 ChangeLens needs operational memory without opaque machine learning or unsupported claims. Deterministic analytics provide reproducible context that AI can explain but cannot override.
 
+## ADR-016 - Structured Qwen3/Ollama Investigation Output
+
+Status: Accepted
+
+### Decision
+
+Investigation requests use a strict prompt schema, structured JSON output from the configured Ollama model, and a safety parser that strips only wrapper text such as Qwen3 reasoning blocks or markdown fences while preserving otherwise valid JSON. The provider parses the raw model response, normalizes one clear JSON object, and passes it to the validator before the investigation is persisted.
+
+The validator enforces the same contract used by the TypeScript interfaces: integer confidence values from 0 to 100, evidence IDs restricted to the supplied allowlist, reasoning type enums, recommendation safety checks, and no untrusted IDs from the model. Errors are surfaced as controlled AppError codes such as AI_INVALID_JSON or AI_VALIDATION_ERROR instead of silently accepting malformed output.
+
+### Reason
+
+Qwen3 may emit reasoning text, markdown fences, or surrounding prose alongside valid JSON. A robust parser and strict validator keep the AI layer bounded, evidence-grounded, and safe without weakening the system's security boundary.
+
 ## ADR-006 - Repository Name
 
 Status: Accepted
