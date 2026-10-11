@@ -4,7 +4,7 @@ ChangeLens is an evidence-first platform for understanding software and infrastr
 
 ## Phase 1
 
-The foundation includes a TypeScript Express API, MongoDB connection, health endpoint, and React/Vite application shell.
+The foundation includes a TypeScript Express API, MongoDB connection, health endpoint, and React/Vite application shell
 
 ### Run the backend
 
