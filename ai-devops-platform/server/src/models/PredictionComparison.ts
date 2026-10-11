@@ -1,0 +1,137 @@
+import { Schema, Types, model, type HydratedDocument } from 'mongoose';
+import type {
+  PredictionComparisonDTO,
+  AccuracyLevel,
+  MetricDirection,
+  ObservedSeverity,
+  PredictionRealityOutcome,
+  SecurityComparison
+} from '../types/predictionReality.js';
+
+export interface PredictionComparisonDocument {
+  changeId: Types.ObjectId;
+  predictionId: Types.ObjectId;
+  observationId: Types.ObjectId;
+  comparedAt: Date;
+  outcome: PredictionRealityOutcome;
+  impactComparison: {
+    predictedCategories: string[];
+    observedCategories: string[];
+    confirmedCategories: string[];
+    unconfirmedCategories: string[];
+    unexpectedCategories: string[];
+  };
+  resourceComparison: {
+    predictedResourceIds: string[];
+    observedResourceIds: string[];
+    confirmedResourceIds: string[];
+    unexpectedResourceIds: string[];
+  };
+  securityComparison: SecurityComparison;
+  metricComparison: Array<{
+    name: string;
+    predictedDirection?: MetricDirection;
+    observedDirection: MetricDirection;
+    match: boolean | null;
+    baseline?: number;
+    observed?: number;
+    delta?: number;
+    unit?: string;
+  }>;
+  blastRadiusComparison: { predictedTotal: number; observedTotal: number | null; delta: number | null };
+  riskComparison: { predictedScore: number; observedSeverity: ObservedSeverity; explanation: string };
+  accuracy: { score: number | null; level: AccuracyLevel };
+  summary: string;
+  evidenceIds: Types.ObjectId[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+const schema = new Schema<PredictionComparisonDocument>(
+  {
+    changeId: { type: Schema.Types.ObjectId, ref: 'Change', required: true },
+    predictionId: { type: Schema.Types.ObjectId, ref: 'PredictionSnapshot', required: true },
+    observationId: { type: Schema.Types.ObjectId, ref: 'ObservedImpact', required: true },
+    comparedAt: { type: Date, required: true },
+    outcome: {
+      type: String,
+      enum: [
+        'predicted_and_observed',
+        'predicted_not_observed',
+        'unexpected_impact',
+        'partially_predicted',
+        'no_significant_impact',
+        'insufficient_evidence'
+      ],
+      required: true
+    },
+    impactComparison: {
+      predictedCategories: [String],
+      observedCategories: [String],
+      confirmedCategories: [String],
+      unconfirmedCategories: [String],
+      unexpectedCategories: [String]
+    },
+    resourceComparison: {
+      predictedResourceIds: [String],
+      observedResourceIds: [String],
+      confirmedResourceIds: [String],
+      unexpectedResourceIds: [String]
+    },
+    securityComparison: {
+      predicted: [Schema.Types.Mixed],
+      observed: [Schema.Types.Mixed],
+      confirmed: [Schema.Types.Mixed],
+      unexpected: [Schema.Types.Mixed],
+      status: String
+    },
+    metricComparison: [
+      {
+        _id: false,
+        name: String,
+        predictedDirection: String,
+        observedDirection: String,
+        match: Boolean,
+        baseline: Number,
+        observed: Number,
+        delta: Number,
+        unit: String
+      }
+    ],
+    blastRadiusComparison: { predictedTotal: Number, observedTotal: Number, delta: Number },
+    riskComparison: { predictedScore: Number, observedSeverity: String, explanation: String },
+    accuracy: { score: Number, level: String },
+    summary: String,
+    evidenceIds: [{ type: Schema.Types.ObjectId, ref: 'Evidence' }]
+  },
+  { timestamps: true }
+);
+schema.index({ changeId: 1, comparedAt: -1 });
+export type PredictionComparisonDocumentHydrated = HydratedDocument<PredictionComparisonDocument>;
+export const PredictionComparisonModel = model<PredictionComparisonDocument>('PredictionComparison', schema);
+export function toPredictionComparisonDTO(doc: PredictionComparisonDocumentHydrated): PredictionComparisonDTO {
+  return {
+    id: doc._id.toString(),
+    changeId: doc.changeId.toString(),
+    predictionId: doc.predictionId.toString(),
+    observationId: doc.observationId.toString(),
+    comparedAt: doc.comparedAt.toISOString(),
+    outcome: doc.outcome ?? 'insufficient_evidence',
+    impactComparison: doc.impactComparison,
+    resourceComparison: doc.resourceComparison,
+    securityComparison: doc.securityComparison ?? {
+      predicted: [],
+      observed: [],
+      confirmed: [],
+      unexpected: [],
+      status: 'insufficient_evidence'
+    },
+    metricComparison: doc.metricComparison,
+    blastRadiusComparison: doc.blastRadiusComparison,
+    riskComparison: doc.riskComparison,
+    accuracy: doc.accuracy,
+    summary: doc.summary,
+    evidenceIds: doc.evidenceIds.map((id) => id.toString()),
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString()
+  };
+}

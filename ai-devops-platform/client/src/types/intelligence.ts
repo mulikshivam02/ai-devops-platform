@@ -1,0 +1,5 @@
+export interface HistoricalPattern { type: string; title: string; description: string; sampleSize: number; matchingChangeIds: string[]; outcomes: string[]; evidenceIds: string[]; confidence: string; limitations: string[]; }
+export interface RiskTrend { status: string; windowDays: number | null; sampleSize: number; averageRiskScore: number | null; highCriticalRate: number | null; rollbackRate: number | null; securityFindingRate: number | null; evidenceIds: string[]; limitations: string[]; }
+export interface PredictionAccuracy { status: string; sampleSize: number; averageAccuracy: number | null; underPredictionRate: number | null; overPredictionRate: number | null; insufficientEvidenceRate: number | null; evidenceIds: string[]; limitations: string[]; }
+export interface IntelligenceOverview { status: string; riskTrend: RiskTrend; predictionAccuracy: PredictionAccuracy; patterns: HistoricalPattern[]; }
+export interface AdvancedInsight { id: string; type: string; title: string; description: string; severity: string; confidence: number; resourceIds: string[]; changeIds: string[]; evidenceIds: string[]; recommendation: string; status: string; }
