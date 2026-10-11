@@ -1,6 +1,6 @@
 # ChangeLens
 
-ChangeLens is an evidence-first platform for understanding software and infrastructure changes.
+ChangeLens is an evidence-first platform for understanding software and infrastructure changes
 
 ## Phase 1
 
