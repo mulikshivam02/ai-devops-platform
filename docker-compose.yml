@@ -1,0 +1,153 @@
+# Required variables (no defaults -- compose will refuse to start without them):
+#   JWT_SECRET, INITIAL_ADMIN_EMAIL, INITIAL_ADMIN_PASSWORD,
+#   MONGO_ROOT_USERNAME, MONGO_ROOT_PASSWORD
+# See .env.example at the repo root. Copy it to .env and fill in real values --
+# `docker compose` reads a root .env automatically. See review 1.7.
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: changelens-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: changelens
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?MONGO_ROOT_USERNAME must be set -- see .env.example}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?MONGO_ROOT_PASSWORD must be set -- see .env.example}
+    # No host port mapping: only other containers on this compose network need to
+    # reach Mongo. Previously "27017:27017" published it, unauthenticated by
+    # default, to anything that could reach this host. See review 1.5. If you need
+    # to inspect the database from your host machine during development, run
+    # `docker compose port mongo 27017` for a one-off forward, or add the mapping
+    # back locally -- don't add it back in a shared/committed compose file.
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--username',
+          '${MONGO_ROOT_USERNAME:?}',
+          '--password',
+          '${MONGO_ROOT_PASSWORD:?}',
+          '--authenticationDatabase',
+          'admin',
+          '--eval',
+          "db.adminCommand('ping')"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: changelens-ollama
+    restart: always
+    # No host port mapping -- only the backend container needs to reach Ollama.
+    # See review 1.5.
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      OLLAMA_NUM_GPU: 0
+    # Ollama will be available at http://ollama:11434 from other containers.
+    # Run: docker exec changelens-ollama ollama pull llama3.2
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: changelens-backend
+    restart: always
+    ports:
+      - '4000:4000'
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:?}:${MONGO_ROOT_PASSWORD:?}@mongo:27017/changelens?authSource=admin
+      # Only used for CORS. The bundled frontend calls /api on its own origin (nginx proxies it here),
+      # so this matters only for a client served from a different origin.
+      CLIENT_URL: http://localhost:3000
+      # nginx is one proxy hop in front of the API: needed so each client gets its own rate-limit
+      # bucket instead of all of them sharing nginx's address.
+      TRUST_PROXY: 1
+      AUTH_DISABLED: 'false'
+      ALLOW_PUBLIC_REGISTRATION: 'false'
+      # No fallback values. A default here defeats the point of a secret -- anyone
+      # who has read this file (which is committed to the repo) could otherwise
+      # forge tokens or log in as admin against any deployment that forgot to set
+      # these. See review 1.4/1.7.
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set to a random string of at least 32 characters -- see .env.example}
+      INITIAL_ADMIN_EMAIL: ${INITIAL_ADMIN_EMAIL:?INITIAL_ADMIN_EMAIL must be set -- see .env.example}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:?INITIAL_ADMIN_PASSWORD must be set -- see .env.example}
+
+      # AI Integration
+      AI_PROVIDER: ollama
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: llama3.2
+      OLLAMA_TIMEOUT_MS: '120000'
+
+      # Optional: GitHub Integration
+      GITHUB_API_BASE_URL: https://api.github.com
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_TIMEOUT_MS: '15000'
+
+      # Optional: Kubernetes Integration
+      KUBERNETES_API_URL: ${KUBERNETES_API_URL:-}
+      KUBERNETES_TOKEN: ${KUBERNETES_TOKEN:-}
+      KUBERNETES_CA_CERT: ${KUBERNETES_CA_CERT:-}
+      KUBERNETES_TIMEOUT_MS: '10000'
+
+      # Optional: Prometheus Integration
+      PROMETHEUS_API_URL: ${PROMETHEUS_API_URL:-}
+      PROMETHEUS_TOKEN: ${PROMETHEUS_TOKEN:-}
+      PROMETHEUS_TIMEOUT_MS: '10000'
+
+      # Optional: Loki Integration
+      LOKI_API_URL: ${LOKI_API_URL:-}
+      LOKI_TOKEN: ${LOKI_TOKEN:-}
+      LOKI_TIMEOUT_MS: '10000'
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:4000/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: changelens-frontend
+    restart: always
+    ports:
+      - '3000:80'
+    # The API address is a BUILD-time setting (see client/Dockerfile); a runtime `environment:` value
+    # here would never reach the already-built bundle. By default the app calls /api, proxied by nginx.
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://127.0.0.1:80/']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  mongo-data:
+    driver: local
+  ollama-data:
+    driver: local
+
+networks:
+  default:
+    name: changelens-network

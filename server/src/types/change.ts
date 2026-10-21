@@ -1,0 +1,60 @@
+export const changeTypes = [
+  'code',
+  'configuration',
+  'infrastructure',
+  'deployment',
+  'dependency',
+  'security',
+  'unknown'
+] as const;
+
+export type ChangeType = (typeof changeTypes)[number];
+
+export const changeStatuses = ['detected', 'deployed', 'failed', 'reverted', 'unknown'] as const;
+
+export type ChangeStatus = (typeof changeStatuses)[number];
+
+export interface ChangeDTO {
+  id: string;
+  resourceId: string;
+  changeId: string;
+  source: string;
+  author?: string;
+  timestamp: string;
+  summary: string;
+  changeType: ChangeType;
+  before?: unknown;
+  after?: unknown;
+  evidenceIds: string[];
+  deploymentId?: string;
+  status: ChangeStatus;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateChangeInput {
+  resourceId: string;
+  changeId: string;
+  source: string;
+  author?: string;
+  timestamp: string;
+  summary: string;
+  changeType: ChangeType;
+  before?: unknown;
+  after?: unknown;
+  evidenceIds?: string[];
+  deploymentId?: string;
+  status?: ChangeStatus;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ChangeFilters {
+  resourceId?: string;
+  source?: string;
+  changeType?: ChangeType;
+  status?: ChangeStatus;
+  author?: string;
+  startTime?: Date;
+  endTime?: Date;
+}

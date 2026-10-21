@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - run: npm ci
+
+      # Gate 1: formatting. Keeps the reformat from silently regressing.
+      - name: Format check
+        run: npm run format:check
+
+      # Gate 2: lint. Zero errors required. Warnings are the tracked baseline that
+      # gets promoted to errors as review findings are closed -- see eslint.config.js.
+      - name: Lint
+        run: npm run lint --max-warnings=100
+
+      # Gate 3: types.
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Gate 4: tests. AUTH_DISABLED is explicitly false so the authorization
+      # matrix actually exercises authenticate + authorizeRequest.
+      - name: Test
+        run: npm test
+        env:
+          NODE_ENV: test
+          AUTH_DISABLED: 'false'
+          MONGODB_URI: mongodb://127.0.0.1:27017/changelens-test
+          JWT_SECRET: ci-only-secret-at-least-32-characters-long
+
+  client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc -b --pretty false
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
